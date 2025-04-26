@@ -8,7 +8,6 @@
   {% block css %}{% endblock %}
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
 </head>
   <body style="margin:10px">
     <h1>{{ title }}</h1>
@@ -31,7 +30,7 @@
     <button id="pauseButton" onclick="pauseButtonToggle(this, mySketch);" style="width: 75px; font-size:12px">
 		        Play
     </button> 
-    <button id="resetButton" onclick="mySketch.intializeSketch();" style="width: 75px; font-size:12px">
+    <button id="resetButton" onclick="mySketch.initializeSketch();" style="width: 75px; font-size:12px">
 					  Reset
 		</button>
     

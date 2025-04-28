@@ -30,7 +30,7 @@ let bouncingBallScript = function (p) {
 			this.acc.add(f);
 		}
 	
-		bounceEdges(fric_Force = true) {
+		bounceEdges(fric_Force = fricCheckBox.checked()) {
 			if (this.pos.y + this.r > p.height) {
 				this.vel.y *= -0.85;
 				this.pos.y += p.height - (this.pos.y + this.r);
@@ -59,8 +59,9 @@ let bouncingBallScript = function (p) {
 	let gravity = p.createVector(0, 0.1);
 	const fric_coeff = 0.075;
 
+	let gravityMagSlider, fricCheckBox, container, label1;
+
 	p.initializeSketch = function() {
-		p.background(220);
 		mv.pos.set(250,80);
 		mv.vel.set(3, -2);
 		p.redraw();
@@ -69,10 +70,25 @@ let bouncingBallScript = function (p) {
 	p.setup = function() {	
 		p.noLoop();
 
-		p.createCanvas(500, 400);
+		let cnv = p.createCanvas(500, 400);
+		cnv.parent('test1');
+		
 		p.fill(100);
-		// Setup slider for - magnitude of gravity and
-		// checkbox for frictional force
+		container = document.getElementById('interactive-controls');
+
+		gravityMagSlider = p.createSlider(0, 1, 0.1, 0.05);
+		gravityMagSlider.parent(container);
+		label1 = p.createSpan('Mag(gravity): '+ gravityMagSlider.value());
+		label1.parent(container);
+
+		fricCheckBox = p.createCheckbox('Activate Friction', true);
+		fricCheckBox.parent(container);
+
+		gravityMagSlider.input(() =>{
+			label1.html('Mag(gravity): '+ gravityMagSlider.value());
+			gravity.set(0, gravityMagSlider.value());
+		})
+
 		p.initializeSketch();
 	}
 	

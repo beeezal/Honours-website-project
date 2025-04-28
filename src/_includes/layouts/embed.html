@@ -26,13 +26,14 @@
     
     {{ content | safe }}
 
-    <div id= "{{ script.split('/') | last | replace('.js', '') }}"></div>
-    <button id="pauseButton" onclick="pauseButtonToggle(this, mySketch);" style="width: 75px; font-size:12px">
-		        Play
-    </button> 
-    <button id="resetButton" onclick="mySketch.initializeSketch();" style="width: 75px; font-size:12px">
-					  Reset
-		</button>
+    <div class="simulation-container">
+      <div id="{{ script.split('/') | last | replace('.js', '') }}" class="interactive-sketch"></div>
+      <div id="interactive-controls" class="interactive-panel"></div>
+      <div class="control-buttons">
+        <button id="pauseButton" onclick="pauseButtonToggle(this, mySketch);">Play</button>
+        <button id="resetButton" onclick="mySketch.initializeSketch();">Reset</button>
+      </div>
+    </div>
     
   </body>
 </html>

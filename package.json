@@ -17,6 +17,7 @@
     "markdown-it-sup": "^2.0.0"
   },
   "devDependencies": {
+    "@11ty/eleventy-plugin-syntaxhighlight": "^5.0.0",
     "eleventy-plugin-mathjax": "^2.0.4"
   }
 }

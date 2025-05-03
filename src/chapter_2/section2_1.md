@@ -25,7 +25,7 @@ update(){
 }
 ```
 
-Here, rand_func is either a built-in function - in __JS__, the __p5__ library^3 4^, or a function made by ourselves  that samples from particular probability distribution. The applied quantity, is either magnitude or direction of the next step which can be modelled as a velocity vector but not always done so. 
+Here, rand_func is either a built-in function - in __JS__, the __p5__ library^3^ ^4^, or a function made by ourselves  that samples from particular probability distribution. The applied quantity, is either magnitude or direction of the next step which can be modelled as a velocity vector but not always done so. 
 
 **Direction**: then the angle is randomly generated and we derive velocity from the angle, with some set magnitude.  
 **Magnitude**: then the x-coordinates and y-coordinates are randomly generated and added to the current position. Or randomly generate a scalar value to be multiplied to a given velocity
@@ -39,7 +39,7 @@ Of course, affecting one parameter of motion usually affects the other and a ran
 The basic walker is implemented without vectors, and hence, just adding changes to the current position each frame is how we implement it. The change is precisely what our applied quantity is and the random distribution is, uniform over the unit-square.
 
  
-The rand_func here is `random(a,b)` returns a uniformly distributed sample from the range (a,b)
+The rand_func here is `random(a,b)` returns a uniformly distributed sample from the range $(a,b)$
 ``` js
 /* A 2D random walk performed by a point object on a screen (Random Walker)
 The Probability distribution taken for the RW is Uniform(-1,1) - separately for the x-value and y-value*/

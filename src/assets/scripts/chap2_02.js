@@ -60,7 +60,7 @@ let normalWalkerScript = function(p) {
     label.parent(container);
 
     stdDevSlider.input(() => {
-      stdDevLabel.html('Std Dev: ' + p.degrees(stdDevSlider.value()) + '°');
+      label.html('Std Dev: ' + p.degrees(stdDevSlider.value()).toFixed(3) + '°');
       stdDev = stdDevSlider.value();
     });
 

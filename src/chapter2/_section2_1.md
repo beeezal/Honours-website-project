@@ -69,8 +69,6 @@ class Walker {
 let w;
 
 //Global functions inbuilt in p5.js, setup() runs once and draw() runs repeatedly
-/*The setup() function is used to define the initial environment properties such as screen size and background color
-and creating any objects required in the programme*/
 function setup() {
   createCanvas(700, 500);
   //Creating an instance 'w' of the of the class Walker
@@ -78,8 +76,6 @@ function setup() {
   background(255);
 }
 
-/*The draw() function is called repeatedly in a infinte loop. It is used to animate the objects in the canvas,
-by repeatedly changing the properties of the object every frame*/
 function draw() { 
   w.display();
   w.update();

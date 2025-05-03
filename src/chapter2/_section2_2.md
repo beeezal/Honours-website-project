@@ -96,6 +96,6 @@ function draw() {
 
 **Extra functionality**:
 
-* checkEdges() \- works the same as bounceEdges() but instead of inverting the direction of motion, we now change the position of the object to the opposite edge.   
-* Changing color of walker \- this is just to show visually the 68-95-99.7 rule \- to see the differences with other values of parameters in real time, [view here](https://openprocessing.org/sketch/2310776) 
+* `checkEdges()` \- works the same as `bounceEdges()` but instead of inverting the direction of motion, we now change the position of the object to the opposite edge.   
+* Changing color of walker \- this is just to show visually the $68-95-99.7$ rule \- to see the differences with other values of parameters in real time, [view here](https://openprocessing.org/sketch/2310776) 
 

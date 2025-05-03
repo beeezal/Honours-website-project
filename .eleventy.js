@@ -31,7 +31,8 @@ export default function(eleventyConfig) {
       output: 'dist'
     },
     markdownTemplateEngine: 'njk',
-    htmlTemplateEngine: 'njk'
+    htmlTemplateEngine: 'njk',
+    pathPrefix: '/Honours-website-project/'
   }
 };
 

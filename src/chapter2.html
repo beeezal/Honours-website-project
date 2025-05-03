@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ chapter-title }}</title>
+  <title>Random Walker</title>
 
   <link rel="stylesheet" type="text/css" href="/assets/css/generic.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
 </head>
 <body style="margin:10px">
-  <h1>Chapter {{ chapter-no }}</h1>
-  <h1>{{ chapter-title }}</h1>
+  <h1>Chapter 2</h1>
+  <h1>Random Walker</h1>
   <hr>
 
   <!-- Shared utility function for pausing and resuming any sketch -->
@@ -26,13 +26,12 @@
     }
   </script>
   
-  {% set chapter = "chap" + "{{ chapter-no }}" %}
-  {% for section in collections[chapter] %}
+  {% for section in collections.chap2 %}
     {{ section.templateContent | safe }}
   {% endfor %}
 
   <!-- Auto-load section scripts -->
-  {% for section in collections[chapter] %}
+  {% for section in collections.chap2 %}
     <script src="{{ section.data.script }}"></script>
   {% endfor %}
 </body>

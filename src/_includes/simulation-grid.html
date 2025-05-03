@@ -1,0 +1,8 @@
+<div class="simulation-container">
+  <div id="{{ id }}" class="interactive-sketch"></div>
+  <div id="interactive-controls-{{ id }}" class="interactive-panel"></div>
+  <div class="control-buttons">
+    <button onclick="pauseButtonToggle(this, {{ id }}Sketch);">Play</button> 
+    <button onclick="{{ id }}Sketch.initializeSketch();">Reset</button>
+  </div>
+</div>

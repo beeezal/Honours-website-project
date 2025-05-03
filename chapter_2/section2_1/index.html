@@ -1,0 +1,211 @@
+
+<html><head><style id="MJX-SVG-styles">
+mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+  min-height: 1px;
+  min-width: 1px;
+}
+
+mjx-container[jax="SVG"] > svg a {
+  fill: blue;
+  stroke: blue;
+}
+
+mjx-assistive-mml {
+  position: absolute !important;
+  top: 0px;
+  left: 0px;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 1px 0px 0px 0px !important;
+  border: 0px !important;
+  display: block !important;
+  width: auto !important;
+  overflow: hidden !important;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+mjx-assistive-mml[display="block"] {
+  width: 100% !important;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][display="true"][width="full"] {
+  display: flex;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line], svg[data-table] > g > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame], svg[data-table] > g > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed, svg[data-table] > g > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted, svg[data-table] > g > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > g > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
+  stroke-width: 3;
+}
+</style></head><body><h2>2.1 Phenomena</h2>
+<p>Attempting to capture the randomness we see around us in a finatry, computational world is of deep interest. This does not disclude motion simulation. From trying to parameterize microbial environments to understand motion of bacteria<sup>1</sup>, to creating a background scene of moths swarming around a light source in the night, the ability to produce randomness (or more precisely <em>pseudo-randomness</em>) is of vast use from the microscopic to the macroscopic world.</p>
+<p>In motion phenomena, when one does not know of all the conditions that lead to a certain outcome, or one simply cannot model all the parameters - randomness is often introduced as a substitute. For example: modelling passing of genetics from parents. It is usually modelled as randomized selection of traits from either parent and changing the traits by slight perturbations - a substitute for evolution.</p>
+<p>Therefore modelling and understanding how randomness is simulated is a crucial step in moving towards more complex natural phenomena. In this project, we will do this by trying to simulate different kinds of random walks - with varying underlying distributions and parameters.</p>
+<h2>2.2 Modelling</h2>
+<p>All things related to representation and motion will remain the same in terms of modelling for this chapter (and the remainder of the project). The only difference of a <em>deterministic</em> motion phenomena to a <em>stochastic</em> one, is that the position of our mover (or ‘walker’ in this chapter) will be updated randomly - according to some probability distribution, as compared to external forces in the environment.<sup>2</sup> Therefore the <code>update()</code> method now will look like</p>
+<pre><code>update(){  
+    applied quantity = rand_function(p1, p2,...)   
+    // Do calculations to go from applied quantity to position  
+      
+   new pos = 𝑓( applied quantity [, old pos] )  
+}
+</code></pre>
+<p>Here, rand_func is either a built-in function - in <strong>JS</strong>, the <strong>p5</strong> library<sup>3</sup> <sup>4</sup>, or a function made by ourselves  that samples from particular probability distribution. The applied quantity, is either magnitude or direction of the next step which can be modelled as a velocity vector but not always done so.</p>
+<p><strong>Direction</strong>: then the angle is randomly generated and we derive velocity from the angle, with some set magnitude.<br>
+<strong>Magnitude</strong>: then the x-coordinates and y-coordinates are randomly generated and added to the current position. Or randomly generate a scalar value to be multiplied to a given velocity</p>
+<p>Of course, affecting one parameter of motion usually affects the other and a random walk with constant direction but varying magnitude is not useful (unless in 1D). Hence, picking x and y coords would also usually ensure the direction changes as well. Hence, it is through combining them with different distributions and/or varying them separately (like constant magnitude and varying direction) we create different simulations of a random walk.</p>
+<h2>2.3 Implementation</h2>
+<h3>2.3.1 Basic random walker</h3>
+<p>The basic walker is implemented without vectors, and hence, just adding changes to the current position each frame is how we implement it. The change is precisely what our applied quantity is and the random distribution is, uniform over the unit-square.</p>
+<p>The rand_func here is <code>random(a,b)</code> returns a uniformly distributed sample from the range <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="4.934ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 2180.7 1000" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><use data-c="28" xlink:href="#MJX-TEX-N-28"></use></g><g data-mml-node="mi" transform="translate(389,0)"><use data-c="1D44E" xlink:href="#MJX-TEX-I-1D44E"></use></g><g data-mml-node="mo" transform="translate(918,0)"><use data-c="2C" xlink:href="#MJX-TEX-N-2C"></use></g><g data-mml-node="mi" transform="translate(1362.7,0)"><use data-c="1D44F" xlink:href="#MJX-TEX-I-1D44F"></use></g><g data-mml-node="mo" transform="translate(1791.7,0)"><use data-c="29" xlink:href="#MJX-TEX-N-29"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo stretchy="false">)</mo></math></mjx-assistive-mml></mjx-container></p>
+<pre tabindex="0" class="code-block"><code class="language-js"><span class="token comment">/* A 2D random walk performed by a point object on a screen (Random Walker)
+The Probability distribution taken for the RW is Uniform(-1,1) - separately for the x-value and y-value*/</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Walker</span> <span class="token punctuation">{</span>
+  <span class="token comment">//This is the class for the RW</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">//we are placing the walker at the center of the screen</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>x <span class="token operator">=</span> width <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>y <span class="token operator">=</span> height <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token function">display</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">//Displays the walker at the given location</span>
+    <span class="token function">stroke</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">point</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>x<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>y<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">//Changes the location of the walker randomly within a unit square of the current location</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>x <span class="token operator">+=</span> <span class="token function">random</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>y <span class="token operator">+=</span> <span class="token function">random</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">let</span> w<span class="token punctuation">;</span>
+
+<span class="token comment">//Global functions inbuilt in p5.js, setup() runs once and draw() runs repeatedly</span>
+<span class="token comment">/*The setup() function is used to define the initial environment properties such as screen size and background color
+and creating any objects required in the programme*/</span>
+<span class="token keyword">function</span> <span class="token function">setup</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">createCanvas</span><span class="token punctuation">(</span><span class="token number">700</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">//Creating an instance 'w' of the of the class Walker</span>
+  w <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Walker</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   
+  <span class="token function">background</span><span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">/*The draw() function is called repeatedly in a infinte loop. It is used to animate the objects in the canvas,
+by repeatedly changing the properties of the object every frame*/</span>
+<span class="token keyword">function</span> <span class="token function">draw</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> 
+  w<span class="token punctuation">.</span><span class="token function">display</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  w<span class="token punctuation">.</span><span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>And this is the output simulation</p>
+<div class="simulation-container">
+  <div id="sec1" class="interactive-sketch"></div>
+  <div id="interactive-controls-sec1" class="interactive-panel"></div>
+  <div class="control-buttons">
+    <button onclick="pauseButtonToggle(this, sec1Sketch);">Play</button> 
+    <button onclick="sec1Sketch.initializeSketch();">Reset</button>
+  </div>
+</div><svg style="display: none;" id="MJX-SVG-global-cache"><defs><path id="MJX-TEX-N-28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path><path id="MJX-TEX-I-1D44E" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path><path id="MJX-TEX-N-2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path><path id="MJX-TEX-I-1D44F" d="M73 647Q73 657 77 670T89 683Q90 683 161 688T234 694Q246 694 246 685T212 542Q204 508 195 472T180 418L176 399Q176 396 182 402Q231 442 283 442Q345 442 383 396T422 280Q422 169 343 79T173 -11Q123 -11 82 27T40 150V159Q40 180 48 217T97 414Q147 611 147 623T109 637Q104 637 101 637H96Q86 637 83 637T76 640T73 647ZM336 325V331Q336 405 275 405Q258 405 240 397T207 376T181 352T163 330L157 322L136 236Q114 150 114 114Q114 66 138 42Q154 26 178 26Q211 26 245 58Q270 81 285 114T318 219Q336 291 336 325Z"></path><path id="MJX-TEX-N-29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></defs></svg></body></html>

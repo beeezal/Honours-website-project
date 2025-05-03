@@ -1,1 +1,0 @@
-<!-- Contnet till x^2 random walker -->

@@ -1,1 +1,0 @@
-<!-- Contnet till normal random walker -->

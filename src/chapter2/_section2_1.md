@@ -1,5 +1,5 @@
 ---
-tags: chap2
+tags: 'chap2'
 script: '/assets/scripts/chap2_01.js'
 id: 'sec1'
 ---
@@ -87,3 +87,7 @@ function draw() {
 And this is the output simulation
 
 {% include "simulation-grid.html" %}
+
+Although the implementation is different from expected from the previous section and chapter, the ideas are the same.  
+The main difference being the representation of our walker is a point - this is because it makes it easier to see the minute changes that happen to the walker each frame  
+Secondly, the other change is that we do not refresh our background is not refreshed every frame, instead we let the walker's previous position be visible throughout the sketch - all we are doing is just colouring a pixel black if the walker has passed through it.  This is a similar adoption to how they are usually represented, although we will eventually switch to our usual motion representation (*‘animated’* style) as we won’t be trying to model random walks, but walkers that possess random movements.^5^ 

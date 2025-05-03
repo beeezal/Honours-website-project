@@ -1,1 +1,0 @@
-<!-- Contnet till system of random walkers -->

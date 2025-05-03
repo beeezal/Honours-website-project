@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": ".eleventy.js",
   "scripts": {
-    "start": "npx eleventy --serve",    
+    "start": "npx eleventy --serve",
     "build": "npx eleventy"
   },
   "keywords": [],
@@ -12,6 +12,11 @@
   "description": "",
   "type": "module",
   "dependencies": {
-    "@11ty/eleventy": "^3.0.0"
+    "@11ty/eleventy": "^3.0.0",
+    "markdown-it-sub": "^2.0.0",
+    "markdown-it-sup": "^2.0.0"
+  },
+  "devDependencies": {
+    "eleventy-plugin-mathjax": "^2.0.4"
   }
 }

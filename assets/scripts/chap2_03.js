@@ -63,7 +63,7 @@ let SquareWalkerScript = function(p) {
     w.location.set(p.width / 2, p.height / 2);
     w.velocity = p5.Vector.random2D();
     w.sa = p.random(0, p.TWO_PI);
-    p.background(200);
+    p.background(255);
 
     p.redraw();
   };
@@ -71,7 +71,7 @@ let SquareWalkerScript = function(p) {
   p.setup = function() {
     p.noLoop();
 
-    let cnv = p.createCanvas(p.windowWidth, p.windowHeight);
+    let cnv = p.createCanvas(600, 400);
     cnv.parent('sec3');
 
     p.initializeSketch();
@@ -79,7 +79,7 @@ let SquareWalkerScript = function(p) {
 
   p.draw = function() {
     w.display();
-    vel_mag = (p.frameCount % 180 == 0) ? p.randomSquared() * 50 : vel_mag;
+    vel_mag = (p.frameCount % 180 === 0) ? p.randomSquared() * 50 : 3;
     w.update(vel_mag, true);
   };
 };

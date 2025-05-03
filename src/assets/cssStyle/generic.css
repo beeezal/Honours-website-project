@@ -1,0 +1,220 @@
+html{
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0 3rem;
+  max-width: 1400px;
+}
+
+h1 {
+  font-size: 2.2rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+h2 {
+  font-size: 1.8rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #444;
+}
+
+h3 {
+  font-size: 1.5rem;
+  margin-top: 1.8rem;
+  margin-bottom: 0.8rem;
+  color: #555;
+}
+canvas {
+  display: block;
+  margin-top: 0;
+  padding: 0;
+  justify-self: center;
+  border: 1px solid rgba(0, 0, 0, 0.1); 
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+p, li {
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0;
+}
+
+/* Styling div for all simulation related elements */
+.simulation-container {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(auto, 200px); 
+  grid-template-rows: auto auto;    /* First row for sketch+panel, second for buttons */
+  gap: 15px; 
+  margin: 0 auto;
+  width: 100%; 
+  max-width: 1200px;   
+  justify-content: center;  
+  justify-items: center;
+}
+
+.interactive-sketch {
+  grid-column: 1;
+  grid-row: 1;
+  width: 100%;
+  margin: 0;
+}
+
+.interactive-panel {
+  position: relative;
+  grid-column: 2;
+  grid-row: 1;
+  background-color: rgba(50, 50, 50, 0.8);
+  padding: 8px;
+  border-radius: 5px;
+  width: 20%;
+  min-width: 150px;
+  color: white;
+  align-self: center;
+}
+
+/* Style all divs inside interactive panel */
+.interactive-panel div {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.interactive-panel span {
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: white;
+}
+
+.interactive-panel input[type="range"] {
+  width: 100%;
+  margin: 5px 0;
+}
+
+.interactive-panel input[type="checkbox"] {
+  margin-top: 5px;
+}
+
+.interactive-panel label {
+  font-size: 14px;
+  color: white;
+}
+
+/* Style for pause and play buttons */
+.control-buttons {
+  grid-column: 1;
+  grid-row: 2;
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.control-buttons button {
+  width: 75px;
+  font-size: 12px;
+  padding: 5px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .simulation-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+  
+  .interactive-sketch {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  
+  .interactive-panel {
+    grid-column: 1;
+    grid-row: 2;
+    min-width: 0;
+    width: 50%;
+  }
+  
+  .control-buttons {
+    grid-column: 1;
+    grid-row: 3;
+  }
+}
+
+/* Styling the pnanel if it is empty */
+.interactive-panel:empty {
+  display: none;
+  visibility: hidden;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  grid-column: unset;
+}
+
+.simulation-container:has(.interactive-panel:empty) {
+  grid-template-columns: 1fr;
+}
+
+.simulation-container:has(.interactive-panel:empty) .interactive-sketch {
+  justify-self: center;
+  max-width: 1200px;
+}
+
+/* Code block general styling */
+pre[class*="language-"],
+pre.code-block {
+  margin: 1.5em 0;
+  border-radius: 4px;
+  padding: 1em;
+  overflow: auto;
+  font-size: 0.9em;
+  line-height: 1.5;
+  text-indent: 0;
+  width: fit-content;
+  max-width: 100%; 
+}
+
+/* Code block content indentation */
+pre[class*="language-"] code,
+pre.code-block code {
+  display: block;
+  padding-left: 2em;
+  tab-size: 4;
+}
+
+/* Inline code styling */
+:not(pre) > code {
+  font-size: 0.9em;
+  padding: 0.15em 0.3em;
+  border-radius: 0.3em;
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #d63384;
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure MathJax equations next to code look good */
+code + mjx-container {
+  margin-left: 0.3em;
+}
+
+/* Styling for pseudocode (unlabeled code blocks) */
+pre:not([class*="language-"]) {
+  background-color: #f5f5f5;
+  border-left: 4px solid #757575;
+  color: #333;
+  font-family: "Consolas", "Monaco", monospace;
+  padding: 1em 1em 1em 1.5em;
+  font-size: 16px;
+  line-height: 1.5;
+}

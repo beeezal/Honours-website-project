@@ -32,6 +32,7 @@ export default function(eleventyConfig) {
     },
     markdownTemplateEngine: 'njk',
     htmlTemplateEngine: 'njk',
+    pathPrefix: '/Honours-website-project/'
   }
 };
 

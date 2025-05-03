@@ -53,6 +53,7 @@ let rWalkerScript = function(p) {
   let rWalkers = new rWalkerSystem();
 
   p.initializeSketch = function() {
+    rWalkers.walkers = [];
     for (let i = 0; i < 5; i++) {
       rWalkers.addWalker(
         p.random(p.width/3, 2*p.width/3), 
@@ -61,26 +62,27 @@ let rWalkerScript = function(p) {
       );
     }
     
+    p.background(255);
     p.redraw();
   };
 
   p.setup = function() {
     p.noLoop();
 
-    let cnv = p.createCanvas(p.windowWidth, p.windowHeight);
+    let cnv = p.createCanvas(700, 500);
     cnv.parent('sec4');
     
     p.initializeSketch();
   };
 
   p.draw = function() {
-    p.background(200, 40);
+    p.background(255, 40);
     rWalkers.run();
   };
 
   p.mouseDragged = function() {
     rWalkers.addWalker(p.mouseX, p.mouseY, 15);
-    p.redraw();
+    if (!isLooping()) p.redraw();
   };
 };
 

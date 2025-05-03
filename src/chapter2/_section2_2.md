@@ -2,6 +2,7 @@
 tags: 'chap2'
 script: '/assets/scripts/chap2_02.js'
 id: 'sec2'
+permalink: false
 ---
 
 ### 2.3.2 Normal random walker

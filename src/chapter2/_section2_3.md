@@ -2,6 +2,7 @@
 tags: 'chap2'
 script: '/assets/scripts/chap2_03.js'
 id: 'sec3'
+permalink: false
 ---
 
 ### 2.3.3 Square-distribution random walker

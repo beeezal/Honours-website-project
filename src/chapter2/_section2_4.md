@@ -2,6 +2,7 @@
 tags: 'chap2'
 script: '/assets/scripts/chap2_04.js'
 id: 'sec4'
+permalink: false
 ---
 ### 2.3.4 A System of Random Walkers
 

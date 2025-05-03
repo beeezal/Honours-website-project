@@ -33,7 +33,7 @@ let normalWalkerScript = function(p) {
     }
   }
 
-  let w = new WalkerNormal(p.width / 2, p.height / 2, 10);
+  let w = new WalkerNormal(p.width/2, p.height/2, 10);
   let stdDevSlider, label, container;
 
   let stdDev = p.PI/8;
@@ -41,7 +41,7 @@ let normalWalkerScript = function(p) {
   p.initializeSketch = function() {
     w.location.set(p.width/2, p.height/2);
     w.velocity.set(p5.Vector.random2D());
-    p.background(200);
+    p.background(255);
 
     p.redraw();
   };
@@ -49,7 +49,7 @@ let normalWalkerScript = function(p) {
   p.setup = function() {
     p.noLoop();
 
-    let cnv = p.createCanvas(p.windowWidth, p.windowHeight);
+    let cnv = p.createCanvas(700, 400);
     cnv.parent('sec2');
     container = document.getElementById('interactive-controls-sec2');
 
@@ -63,6 +63,8 @@ let normalWalkerScript = function(p) {
       stdDevLabel.html('Std Dev: ' + p.degrees(stdDevSlider.value()) + '°');
       stdDev = stdDevSlider.value();
     });
+
+    p.initializeSketch();
   };
 
   p.draw = function() {

@@ -2,6 +2,7 @@
 tags: 'chap2'
 script: '/assets/scripts/chap2_01.js'
 id: 'sec1'
+permalink: false
 ---
 
 ## 2.1 Phenomena

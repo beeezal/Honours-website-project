@@ -10,7 +10,14 @@ export default function(eleventyConfig) {
   eleventyConfig.addLayoutAlias('base', 'layouts/base.html');
 
   // Add Markdown-it plugins
-  eleventyConfig.amendLibrary("md", (mdLib) => mdLib.use(markdownItSup));
+  eleventyConfig.amendLibrary("md", (mdLib) => {
+    mdLib.set({
+      linkify: true, 
+      breaks: true
+    });
+
+    mdLib.use(markdownItSup);
+  });
     
   // Add MathJax plugin
   eleventyConfig.addPlugin(mathjaxPlugin);

@@ -1,0 +1,33 @@
+---
+tags: [main, multi-agent]
+title: Multi-Agent Systems
+layout: 'base'
+---
+
+<h1>Chapter 5</h1>
+<h1>Multi-Agent Systems</h1>
+<hr>
+<!-- Shared utility function for pausing and resuming any sketch -->
+<script>  
+  let pauseButtonToggle = function (button, sketch) {
+    if (sketch.isLooping()) {
+      button.innerText = "Play";
+      sketch.noLoop();
+    } else {
+      button.innerText = "Pause";
+      sketch.loop();
+    }
+  }
+</script>
+<script src="{{ '/assets/scripts/mover2.js' | url }}"></script>
+
+{% for section in collections.chap5 %}
+  {{ section.templateContent | safe }}
+{% endfor %}
+
+
+
+<!-- Auto-load section scripts -->
+{% for section in collections.chap5 %}
+  <script src="{{ section.data.script | url }}"></script>
+{% endfor %}

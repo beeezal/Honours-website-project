@@ -1,10 +1,9 @@
-// A simple p5js script 'simple_script.js'
 let bouncingBallScript = function (p) {
 	class Mover {
 		constructor(x, y, m) {
 			this.pos = p.createVector(x, y);
 			this.vel = p.createVector(3, -2);
-			this.acc = p.createVector();    // Creates a vector of default values (0,0)
+			this.acc = p.createVector();
 			this.mass = m;
 			this.r = m * 0.875;
 			this.D = this.r * 2;
@@ -14,8 +13,6 @@ let bouncingBallScript = function (p) {
 			this.vel.add(this.acc);
 			this.pos.add(this.vel);
 			this.acc.mult(0);
-			// bounceEdges() is called after the reset, since the effect of friction
-			// applied in bounceEdges() is only used in the next frame 
 			this.bounceEdges();
 		}
 	
@@ -24,8 +21,6 @@ let bouncingBallScript = function (p) {
 		}
 	
 		applyForce(force) {
-			// Since we may not want to directly affect the vector that is passed to us 
-			// we have to create a copy apply second law to the copied vector
 			let f = p5.Vector.div(force, this.mass);
 			this.acc.add(f);
 		}
@@ -71,10 +66,10 @@ let bouncingBallScript = function (p) {
 		p.noLoop();
 
 		let cnv = p.createCanvas(500, 400);
-		cnv.parent('test1');
+		cnv.parent('sec2');
 		
 		p.fill(100);
-		container = document.getElementById('interactive-controls');
+		container = document.getElementById('interactive-controls-sec2');
 
 		gravityMagSlider = p.createSlider(0, 1, 0.1, 0.05);
 		gravityMagSlider.parent(container);
@@ -102,4 +97,4 @@ let bouncingBallScript = function (p) {
 	}
 }
 
-let mySketch = new p5(bouncingBallScript, 'test1');
+let sec2Sketch = new p5(bouncingBallScript, 'sec2');

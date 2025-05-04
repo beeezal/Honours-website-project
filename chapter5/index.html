@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> Multi-Agent Systems </title>
+
+  
+  <link rel="stylesheet" type="text/css" href="/Honours-website-project/assets/cssStyle/generic.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer=""></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js" defer=""></script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+</head>
+
+<body>
+ 
+  
+<h1>Chapter 5</h1>
+<h1>Multi-Agent Systems</h1>
+<hr>
+<!-- Shared utility function for pausing and resuming any sketch -->
+<script>  
+  let pauseButtonToggle = function (button, sketch) {
+    if (sketch.isLooping()) {
+      button.innerText = "Play";
+      sketch.noLoop();
+    } else {
+      button.innerText = "Pause";
+      sketch.loop();
+    }
+  }
+</script>
+<script src="/Honours-website-project/assets/scripts/mover2.js"></script>
+
+
+  <h2>5.1 Phenomena</h2>
+<p>Even though we have been working with just individual agents till now, interactive behaviour where two or more entities/agents come together is a major part of natural phenomena, especially motion behaviours. There are many complex and emergent behaviours that can arise from simple individualistic behaviour.<sup>1</sup></p>
+<ul>
+<li>
+<p>A prey-predator system - prey - deer - evader. Predator - cheetah - seeker</p>
+</li>
+<li>
+<p>Predator-prey(s) system - preys - small fishes, predator - shark/large fish</p>
+<ul>
+<li>Here fishes not only try to escape - but stay with the crowd, not bump into each other, etc.</li>
+</ul>
+</li>
+<li>
+<p>Or a predator(s)-prey system - prey - giraffe, predators - pride of lions</p>
+<ul>
+<li>More complex predators - how to optimally approach s.t., prey is caught fast</li>
+<li>How does prey now evade - or include other behaviours like self defence - kick away the predators.</li>
+</ul>
+</li>
+</ul>
+<p>However, it is important to accept that there is a fundamental limitation as to what we can simulate with just the modelling methods mentioned in previous chapters and the ones mentioned below. It is essential and sometimes easier to introduce <em>evolutionary computing</em> and <em>neural networks</em> - just like how noise algorithms were introduced for procedural texture/smooth-randomness generation instead of manual generation. Even a naive model of evolution in the predator(s) prey phenomena, where the steering choices made by the parent generation is taken and the best choices are passed down - it would lead to more complex behaviour - changing behaviour across generations (here each gen can be placed in the same situation)</p>
+<p>But in this thesis we shall not pursue that route but, to try to understand what we mean by life-like behaviour exhibited by autonomous characters - i.e. what makes them autonomous in the first place. And to show how much is possible even without introducing <em>evolution</em> or <em>neural</em> computational models.<sup>2</sup></p>
+<h2>5.2 Modelling</h2>
+<ol>
+<li>
+<p>Individual agents are modelled with the same approach as in previous chapters</p>
+</li>
+<li>
+<p>There are two kinds of multi-agent steering behaviour we will model both into our system and individual:</p>
+<ul>
+<li>
+<p>Top-down : where if an agent belongs to a group, it will have to follow the rules/behaviors imposed by the group. Suppose, we are simulating a swarm of fish in a large aquatic tank, then flow following and wall containment might be a general rule for all members</p>
+</li>
+<li>
+<p>Bottom-up : Used when individuals have a preference, say an agent wants to stay away from other entities by 10 px, or move in the same direction as neighbouring agents. Such individualistic behaviours will often cause a chain reaction across all agents of the system (assuming all of them have the same behaviour as well, or a behaviour that will be affected by it). Which may or may not lead to emergent behaviour of the system</p>
+</li>
+</ul>
+</li>
+<li>
+<p>The system will be capable of keeping track individual properties - lifespan, count, etc:<br>
+a.  To which users must also have access through the system<br>
+b.  and execute actions - removal if dead, capping at a maximum number, etc</p>
+</li>
+</ol>
+<h2>5.3 Implementation</h2>
+<h3>5.3.2 Implementation of system of agents</h3>
+<p>We will make use of classes to create our agent system. Although ideally just like in the individual case we could create an abstract class that uses the <code>AutonMover</code> as its base individual model, and then extend this class further for specific cases, this is harder to do practically.<sup>3</sup> And classifying which properties can be made part of the abstract class and which cannot is a tedious task. Therefore instead we shall implement just single-behaviour agents into a system, and for each behaviour we shall make a separate system class.</p>
+<p>For example, <em>Seekers</em> is the class that implements a system of <em>Seeker</em> agents. Features that are implemented into the class as per the model mentioned in <a href="#52-modelling">5.2</a>. Each individual is stored in an array (implemented as property this.<em>seekers</em>) , with a <code>maxCapacity</code> constraint (also a property). This allows one to access individual agents from the system</p>
+<pre tabindex="0" class="code-block"><code class="language-js"><span class="token keyword">class</span> <span class="token class-name">Seekers</span> <span class="token punctuation">{</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">maxCapacity <span class="token operator">=</span> <span class="token number">40</span></span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>seekers <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>maxCapacity <span class="token operator">=</span> maxCapacity<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token function">addSeeker</span><span class="token punctuation">(</span><span class="token parameter">x<span class="token punctuation">,</span> y<span class="token punctuation">,</span> r</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>seekers<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Seeker</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">,</span> r<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span></code></pre>
+<p>A <code>run()</code> method which will go through every agent and and call the relevant functions for the following:</p>
+<ul>
+<li>
+<p>Bottom-up behaviours - implemented on a individual level - called with (possibly) varying parameters - can vary agent-agent - or timeframe - timeframe (depending on situation)</p>
+</li>
+<li>
+<p>Top-down behaviours - implemented individually, because</p>
+<ul>
+<li>
+<p>If implemented system-wise - it will still have to be looped over for each agent. Therefore requiring multiple loops for each behaviour</p>
+</li>
+<li>
+<p>Therefore to avoid clutter, lower computational costs - behaviour is still implemented individually<sup>4</sup></p>
+</li>
+</ul>
+</li>
+<li>
+<p>Checks if <code>agent.lifespan = 0</code> - i.e. dead and removes it from</p>
+</li>
+</ul>
+<p>Thus the <code>AutonMover</code> class is now updated such that, it has group related behaviours implemented in them, and each child class can now now combine these behaviours and apply a steering Force, according to weights and other parameters imputed into a <code>applyBehaviours( )</code> method - inner contents differ individual type to type.</p>
+<p>This also implies that the <code>update()</code> method no longer deals with applying the steering force for the respective behaviour, and hence can be moved to the <code>AutonMover</code> class.</p>
+<p>The updated <code>AutonMover</code> class</p>
+<pre tabindex="0" class="code-block"><code class="language-js">  <span class="token function">steer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">let</span> steer <span class="token operator">=</span> p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">sub</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    steer<span class="token punctuation">.</span><span class="token function">limit</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>maxForce<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> steer<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token function">separate</span><span class="token punctuation">(</span><span class="token parameter">entityArray</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">let</span> count <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> otherAgent <span class="token keyword">of</span> entityArray<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">let</span> diffVector <span class="token operator">=</span> p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">sub</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">,</span> otherAgent<span class="token punctuation">.</span>pos<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>otherAgent <span class="token operator">!==</span> <span class="token keyword">this</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>diffVector<span class="token punctuation">.</span><span class="token function">mag</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token keyword">this</span><span class="token punctuation">.</span>desiredSeparation<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        diffVector<span class="token punctuation">.</span><span class="token function">setMag</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">/</span> diffVector<span class="token punctuation">.</span><span class="token function">mag</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>diffVector<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        count<span class="token operator">++</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>count <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel<span class="token punctuation">.</span><span class="token function">setMag</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>maxSpeed<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">steer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token function">createVector</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token function">cohere</span><span class="token punctuation">(</span><span class="token parameter">entityArray</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">let</span> count <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">let</span> avgPos <span class="token operator">=</span> <span class="token function">createVector</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> otherAgent <span class="token keyword">of</span> entityArray<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>otherAgent <span class="token operator">!==</span> <span class="token keyword">this</span> <span class="token operator">&amp;&amp;</span> p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">dist</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">,</span> otherAgent<span class="token punctuation">.</span>pos<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token keyword">this</span><span class="token punctuation">.</span>neighbourDistance<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        avgPos<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>otherAgent<span class="token punctuation">.</span>pos<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        count<span class="token operator">++</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>count <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      sum<span class="token punctuation">.</span><span class="token function">div</span><span class="token punctuation">(</span>count<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel <span class="token operator">=</span> p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">sub</span><span class="token punctuation">(</span>sum<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">steer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">return</span> <span class="token function">createVector</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token function">align</span><span class="token punctuation">(</span><span class="token parameter">entityArray</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">let</span> count <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> otherAgent <span class="token keyword">of</span> entityArray<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>otherAgent <span class="token operator">!==</span> <span class="token keyword">this</span> <span class="token operator">&amp;&amp;</span> p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">dist</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">,</span> otherAgent<span class="token punctuation">.</span>pos<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token keyword">this</span><span class="token punctuation">.</span>neighbourDistance<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>otherAgent<span class="token punctuation">.</span>vel<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        count<span class="token operator">++</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>count <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel<span class="token punctuation">.</span><span class="token function">div</span><span class="token punctuation">(</span>count<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">steer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">return</span> <span class="token function">createVector</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token function">update</span><span class="token punctuation">(</span><span class="token parameter">chk_edges <span class="token operator">=</span> <span class="token boolean">false</span></span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">updateHistory</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>acc<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>acc<span class="token punctuation">.</span><span class="token function">mult</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>chk_edges<span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">checkEdges</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span></code></pre>
+<p>and</p>
+<pre tabindex="0" class="code-block"><code class="language-js">  <span class="token function">isDead</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+      <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>lifespan <span class="token operator">&lt;=</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span></code></pre>
+<p>And <code>applyBehaviours()</code> method in <code>Seeker</code> class:</p>
+<pre tabindex="0" class="code-block"><code class="language-js"><span class="token function">applyBehaviours</span><span class="token punctuation">(</span><span class="token parameter">seekWeight <span class="token operator">=</span> <span class="token number">0.5</span><span class="token punctuation">,</span> sepWeight <span class="token operator">=</span> <span class="token number">0.5</span><span class="token punctuation">,</span> target <span class="token operator">=</span> <span class="token function">createVector</span><span class="token punctuation">(</span>width<span class="token operator">/</span><span class="token number">2</span><span class="token punctuation">,</span>height<span class="token operator">/</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">,</span> arrive <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">,</span> entityArray <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span></span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">let</span> seekForce <span class="token operator">=</span> p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">mult</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">seek</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> arrive<span class="token punctuation">)</span><span class="token punctuation">,</span> seekWeight<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">let</span> separationForce <span class="token operator">=</span> p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">mult</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">separate</span><span class="token punctuation">(</span>entityArray<span class="token punctuation">)</span><span class="token punctuation">,</span> sepWeight<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">applyForce</span><span class="token punctuation">(</span>seekForce<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">applyForce</span><span class="token punctuation">(</span>separationForce<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span></code></pre>
+<ul>
+<li>If maxCapacity is reached, then newly added members are immediately removed
+<ul>
+<li>Another possibility is that remove a fairly ‘old’ agent - i.e. has lifespan close to 0 (portrays use of lifespan property - intend to implement)</li>
+</ul>
+</li>
+</ul>
+<p>All the above encompassed within <code>run()</code> method of the <code>Seekers</code> class:</p>
+<pre tabindex="0" class="code-block"><code class="language-js"> <span class="token function">run</span><span class="token punctuation">(</span><span class="token parameter">target</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> i <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>seekers<span class="token punctuation">.</span>length <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span> i <span class="token operator">&gt;=</span> <span class="token number">0</span><span class="token punctuation">;</span> i<span class="token operator">--</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>seekers<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">display</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+      <span class="token keyword">this</span><span class="token punctuation">.</span>seekers<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">applyBehaviours</span><span class="token punctuation">(</span><span class="token comment">/*seekWeight*/</span> <span class="token number">0.5</span><span class="token punctuation">,</span> <span class="token comment">/*sepWeight*/</span> <span class="token number">0.5</span><span class="token punctuation">,</span> 
+                                      <span class="token comment">/*target*/</span> target<span class="token punctuation">,</span> <span class="token comment">/*arrive*/</span> <span class="token boolean">false</span><span class="token punctuation">,</span> 
+                                      <span class="token comment">/*entityArray*/</span> <span class="token keyword">this</span><span class="token punctuation">.</span>seekers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+      <span class="token keyword">this</span><span class="token punctuation">.</span>seekers<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">update</span><span class="token punctuation">(</span><span class="token comment">/*chk_edges*/</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>seekers<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">isDead</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>seekers<span class="token punctuation">.</span><span class="token function">splice</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span></code></pre>
+<p>Putting it all together, you get this:</p>
+<div class="simulation-container">
+  <div id="sec1" class="interactive-sketch"></div>
+  <div id="interactive-controls-sec1" class="interactive-panel"></div>
+  <div class="control-buttons">
+    <button onclick="pauseButtonToggle(this, sec1Sketch);">Play</button> 
+    <button onclick="sec1Sketch.initializeSketch();">Reset</button>
+  </div>
+</div>
+
+  <p>Finally, here is a implementation of flocking behaviour, whose design is taken from <em>Autonomous Agents</em> chapter by [Schiffman 24], but the implementation is based on the models that we see in this chapter,</p>
+<div class="simulation-container">
+  <div id="sec2" class="interactive-sketch"></div>
+  <div id="interactive-controls-sec2" class="interactive-panel"></div>
+  <div class="control-buttons">
+    <button onclick="pauseButtonToggle(this, sec2Sketch);">Play</button> 
+    <button onclick="sec2Sketch.initializeSketch();">Reset</button>
+  </div>
+</div>
+<h2>Notes:</h2>
+<ol>
+<li>
+<p>Individualistic also means selfish behaviours. If one observes closely none of the models of behaviour and hence implementation looks at behaviour an agent makes for the sake of another agent - separation is designed with the intention of ‘how can I avoid colliding with others to save myself’ over ‘how can I move away so that others can move without trouble’.</p>
+<p>This, in the world of code, makes no difference, as optimal states reach from either side. But - are there possible complications / simplifications that could arise when we try and code altruistic agents - how can we model such behaviour - as sometimes that is also found in nature - leader following, etc.</p>
+</li>
+<li>
+<p>Much work has been done in different directions - each interesting in their own regard. One, trying to classify and formalise the notion of autonomous agents - when it is all just code and algorithms [Franklin 97] and the other is also seeing how far can one can go without implementing reasoning and intelligence directly into their model [Brooks 91] - this could be one of many FUTURE WORK.</p>
+</li>
+<li>
+<p>The hardness comes from identifying what child type is each individual agent - if the system is heterogeneous (or even when homogeneous) and then apply that type specific behaviours to it. This could again be implemented with the help of callback functions and type definitions / identification methods. But types are not natively built into JS - TypeScript is an extended programming language that does exactly that. Therefore, such implementations are beyond the scope of this thesis.</p>
+</li>
+<li>
+<p>One drawback of this approach is that we cannot have different parameters for the same behaviour for different agents. At least, no simple, intuitive approach exists in <strong>p5</strong>.js or <strong>JS</strong></p>
+</li>
+</ol>
+
+
+
+
+
+<!-- Auto-load section scripts -->
+
+  <script src="/Honours-website-project/assets/scripts/chap5_01.js"></script>
+
+  <script src="/Honours-website-project/assets/scripts/chap5_02.js"></script>
+
+
+</body>
+</html>

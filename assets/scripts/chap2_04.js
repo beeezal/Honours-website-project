@@ -82,7 +82,7 @@ let rWalkerScript = function(p) {
 
   p.mouseDragged = function() {
     rWalkers.addWalker(p.mouseX, p.mouseY, 15);
-    if (!isLooping()) p.redraw();
+    if (!p.isLooping()) p.redraw();
   };
 };
 

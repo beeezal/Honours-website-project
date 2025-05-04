@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> Deterministic Motion </title>
+
+  
+  <link rel="stylesheet" type="text/css" href="/Honours-website-project/assets/cssStyle/generic.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer=""></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js" defer=""></script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+<style id="MJX-SVG-styles">
+mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+  min-height: 1px;
+  min-width: 1px;
+}
+
+mjx-container[jax="SVG"] > svg a {
+  fill: blue;
+  stroke: blue;
+}
+
+mjx-assistive-mml {
+  position: absolute !important;
+  top: 0px;
+  left: 0px;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 1px 0px 0px 0px !important;
+  border: 0px !important;
+  display: block !important;
+  width: auto !important;
+  overflow: hidden !important;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+mjx-assistive-mml[display="block"] {
+  width: 100% !important;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][display="true"][width="full"] {
+  display: flex;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line], svg[data-table] > g > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame], svg[data-table] > g > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed, svg[data-table] > g > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted, svg[data-table] > g > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > g > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
+  stroke-width: 3;
+}
+</style></head>
+
+<body>
+ 
+  
+<h1>Chapter 1</h1>
+<h1>Deterministic Motion</h1>
+<hr>
+<!-- Shared utility function for pausing and resuming any sketch -->
+<script>  
+  let pauseButtonToggle = function (button, sketch) {
+    if (sketch.isLooping()) {
+      button.innerText = "Play";
+      sketch.noLoop();
+    } else {
+      button.innerText = "Pause";
+      sketch.loop();
+    }
+  }
+</script>
+
+
+  <p>The aim of this chapter is to introduce the basics of 2D animation provided by the <strong>p5.js</strong> library, through examples of simple deterministic motion. This will be the foundation of motion simulation that I will be discussing for the rest of the project.</p>
+<h2>1.1 Phenomena</h2>
+<p>One of the most important and elementary features of life is the ability to move. Therefore it is essential for us to be able to simulate entities moving across the screen (our environment). But before simulating complex life-like motion, let us first simplify the problem to simulating simple motion - like an object moving along a straight line. This allows us to understand the modelling and implementation of simulating motion in our <strong>p5</strong> sketches (these are explained further below) and extend the ideas to any kind of motion simulation.</p>
+<p>We will build our simulations in this chapter around one of the key ideas of classical mechanics - Forces. We also ask the question: how does the existence of external forces such as gravity, air resistance, drag and friction affect the motion of inanimate objects? Further, how can we define such characteristics in our virtual environment such that the resulting simulations are akin to that seen in the real physical world? These are two sides of the same coin that we will continue to explore - break down phenomena into simple pieces by coding and picking out important parameters of the phenomena from the code.</p>
+<p>Viewing motion simulation in such a manner allows us to move smoothly from simple animations, i.e. motion of an object in a straight line or a stationary object, to simple but naturally occurring physical phenomena, such as a ball being dropped to the ground from some height under the influence of gravity, parabolic motion of a thrown object, etc.</p>
+<p>And finally the one shown below may not be a naturally occurring phenomenon, but to justify its implementation in code, I state the following: have we all not played around with a bouncing ball - throw it at a particular angle and see what reaction we get from the ball and its interactions with the wall, floor and household objects. Therefore, it's a simple yet an informative experiment to see the influence of gravity, collision and friction on a moving object.</p>
+<h2>1.2 Modeling</h2>
+<p>First, in order to simulate the effect of forces on an object, we need to represent the object in our virtual environment - the screen - or the <strong>p5</strong> canvas (or just canvas). To simplify the physics - hence shortening code lengths, and to simplify the visualisation of our object, we will use a circle to represent our object and will be considered to be a point-mass object (where all the mass is concentrated at the centre)1</p>
+<p>Now that we have the canvas (environment) and the circle (entity/object), we also need to represent time. This is done through redrawing on our canvas every frame.<br>
+For example, let’s say we initially draw the circle at the centre of canvas, then we would erase that drawing and draw the circle again a little bit to the right, repeat this a few times moving the circle a little bit to the right each time. Now show each of these drawings one by one at a particular speed (i.e. frame rate). If the speed is fast enough and the change in position is close enough, then voilà! You have your circle moving from left to right seemingly continuous to the eye.<br>
+This is precisely how animated motion pictures are made, and one can think of this as the digital analog. Note that this method of simulating motion is not something that has magically appeared, but from our intuitive understanding of motion in terms of displacement.</p>
+<p>Displacement is just the change in position over time. Now, of course, in order to move to the continuous world, we would have to take limits of the change (in position) and derive the velocity <strong>at every instant</strong>, but that is impossible since the continuum is uncountable (i.e., you can never complete calculating velocity at ‘every instant’). But such instantaneous calculations are unnecessary for all practical purposes, since our brain cannot tell the difference visually between a continuous motion over 2 seconds versus many discrete steps of motion over 2 seconds<sup>2</sup>. Now, since it is in every frame that we change the position of the object, a convenient and natural <strong>unit of time is the frame rate</strong>. Similarly, since we also change the position of our object in terms of pixels3, we will consider the unit of distance to be pixels (or px). Thus any mention of value without attached units must be interpreted respectively. E.g. speed = <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.05ex;" xmlns="http://www.w3.org/2000/svg" width="1.131ex" height="1.557ex" role="img" focusable="false" viewBox="0 -666 500 688" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mn"><use data-c="35" xlink:href="#MJX-TEX-N-35"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>5</mn></math></mjx-assistive-mml></mjx-container> , means that we are setting the variable ‘speed’ to be <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.05ex;" xmlns="http://www.w3.org/2000/svg" width="1.131ex" height="1.557ex" role="img" focusable="false" viewBox="0 -666 500 688" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mn"><use data-c="35" xlink:href="#MJX-TEX-N-35"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>5</mn></math></mjx-assistive-mml></mjx-container> px/f</p>
+<h3>1.2.2 Modelling of physics:</h3>
+<p>The topic of physics we are engaging with - dynamics in 2 dimensions - uses both magnitude and direction to describe motion phenomena. Therefore, following suit with the usual textbook method of modelling these dual-parameter notions, we shall use vectors, since we are also already using a Cartesian plane to describe the position of entities.</p>
+<p>Vectors are not only a useful tool to quantify relative position, through vector subtraction, but also a compact way of describing change. There are two ways in which we represent these vectors - Cartesian and Polar coordinates - either might be used depending on the situation and perspective required.</p>
+<p>For example, if I have to move from point A to B, we first embed the positions of A and B, as vectors relative to the origin - which is already given to us in the usual Cartesian representation.<br>
+Now all we have to do is find out the units along the <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.025ex;" xmlns="http://www.w3.org/2000/svg" width="1.294ex" height="1.025ex" role="img" focusable="false" viewBox="0 -442 572 453" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><use data-c="1D465" xlink:href="#MJX-TEX-I-1D465"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi></math></mjx-assistive-mml></mjx-container>-axis (let’s call it <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.025ex;" xmlns="http://www.w3.org/2000/svg" width="1.294ex" height="1.025ex" role="img" focusable="false" viewBox="0 -442 572 453" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><use data-c="1D465" xlink:href="#MJX-TEX-I-1D465"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi></math></mjx-assistive-mml></mjx-container>) and the no. of units along the y-axis is B from A (this can also be done through vector subtraction of the position vectors of A and B). Now the vector <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="5.169ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 2284.7 1000" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><use data-c="28" xlink:href="#MJX-TEX-N-28"></use></g><g data-mml-node="mi" transform="translate(389,0)"><use data-c="1D465" xlink:href="#MJX-TEX-I-1D465"></use></g><g data-mml-node="mo" transform="translate(961,0)"><use data-c="2C" xlink:href="#MJX-TEX-N-2C"></use></g><g data-mml-node="mi" transform="translate(1405.7,0)"><use data-c="1D466" xlink:href="#MJX-TEX-I-1D466"></use></g><g data-mml-node="mo" transform="translate(1895.7,0)"><use data-c="29" xlink:href="#MJX-TEX-N-29"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></math></mjx-assistive-mml></mjx-container> precisely holds the information about how far and in what direction is B from A.</p>
+<p>(Intend to add a diagram, that shows how two vectors are added and subtracted)</p>
+<p>Therefore, a simple vector addition of <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="5.169ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 2284.7 1000" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><use data-c="28" xlink:href="#MJX-TEX-N-28"></use></g><g data-mml-node="mi" transform="translate(389,0)"><use data-c="1D465" xlink:href="#MJX-TEX-I-1D465"></use></g><g data-mml-node="mo" transform="translate(961,0)"><use data-c="2C" xlink:href="#MJX-TEX-N-2C"></use></g><g data-mml-node="mi" transform="translate(1405.7,0)"><use data-c="1D466" xlink:href="#MJX-TEX-I-1D466"></use></g><g data-mml-node="mo" transform="translate(1895.7,0)"><use data-c="29" xlink:href="#MJX-TEX-N-29"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></math></mjx-assistive-mml></mjx-container> to the position vector A is how we will linearly move an object from A to B in one frame.<br>
+But, suppose the two points A and B are much further apart, and we want to only reach B in 200 frames then we can scale down the magnitude of <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="5.169ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 2284.7 1000" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><use data-c="28" xlink:href="#MJX-TEX-N-28"></use></g><g data-mml-node="mi" transform="translate(389,0)"><use data-c="1D465" xlink:href="#MJX-TEX-I-1D465"></use></g><g data-mml-node="mo" transform="translate(961,0)"><use data-c="2C" xlink:href="#MJX-TEX-N-2C"></use></g><g data-mml-node="mi" transform="translate(1405.7,0)"><use data-c="1D466" xlink:href="#MJX-TEX-I-1D466"></use></g><g data-mml-node="mo" transform="translate(1895.7,0)"><use data-c="29" xlink:href="#MJX-TEX-N-29"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></math></mjx-assistive-mml></mjx-container> by 200 - using scalar multiplication to get <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="6.424ex" height="2.283ex" role="img" focusable="false" viewBox="0 -759 2839.6 1009" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><use data-c="28" xlink:href="#MJX-TEX-N-28"></use></g><g data-mml-node="msup" transform="translate(389,0)"><g data-mml-node="mi"><use data-c="1D465" xlink:href="#MJX-TEX-I-1D465"></use></g><g data-mml-node="mo" transform="translate(605,363) scale(0.707)"><use data-c="2032" xlink:href="#MJX-TEX-V-2032"></use></g></g><g data-mml-node="mo" transform="translate(1238.5,0)"><use data-c="2C" xlink:href="#MJX-TEX-N-2C"></use></g><g data-mml-node="msup" transform="translate(1683.1,0)"><g data-mml-node="mi"><use data-c="1D466" xlink:href="#MJX-TEX-I-1D466"></use></g><g data-mml-node="mo" transform="translate(523,363) scale(0.707)"><use data-c="2032" xlink:href="#MJX-TEX-V-2032"></use></g></g><g data-mml-node="mo" transform="translate(2450.6,0)"><use data-c="29" xlink:href="#MJX-TEX-N-29"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo stretchy="false">(</mo><msup><mi>x</mi><mo data-mjx-alternate="1">′</mo></msup><mo>,</mo><msup><mi>y</mi><mo data-mjx-alternate="1">′</mo></msup><mo stretchy="false">)</mo></math></mjx-assistive-mml></mjx-container>, then <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="6.424ex" height="2.283ex" role="img" focusable="false" viewBox="0 -759 2839.6 1009" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><use data-c="28" xlink:href="#MJX-TEX-N-28"></use></g><g data-mml-node="msup" transform="translate(389,0)"><g data-mml-node="mi"><use data-c="1D465" xlink:href="#MJX-TEX-I-1D465"></use></g><g data-mml-node="mo" transform="translate(605,363) scale(0.707)"><use data-c="2032" xlink:href="#MJX-TEX-V-2032"></use></g></g><g data-mml-node="mo" transform="translate(1238.5,0)"><use data-c="2C" xlink:href="#MJX-TEX-N-2C"></use></g><g data-mml-node="msup" transform="translate(1683.1,0)"><g data-mml-node="mi"><use data-c="1D466" xlink:href="#MJX-TEX-I-1D466"></use></g><g data-mml-node="mo" transform="translate(523,363) scale(0.707)"><use data-c="2032" xlink:href="#MJX-TEX-V-2032"></use></g></g><g data-mml-node="mo" transform="translate(2450.6,0)"><use data-c="29" xlink:href="#MJX-TEX-N-29"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo stretchy="false">(</mo><msup><mi>x</mi><mo data-mjx-alternate="1">′</mo></msup><mo>,</mo><msup><mi>y</mi><mo data-mjx-alternate="1">′</mo></msup><mo stretchy="false">)</mo></math></mjx-assistive-mml></mjx-container> is precisely the velocity vector, therefore simply by adding <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="6.424ex" height="2.283ex" role="img" focusable="false" viewBox="0 -759 2839.6 1009" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><use data-c="28" xlink:href="#MJX-TEX-N-28"></use></g><g data-mml-node="msup" transform="translate(389,0)"><g data-mml-node="mi"><use data-c="1D465" xlink:href="#MJX-TEX-I-1D465"></use></g><g data-mml-node="mo" transform="translate(605,363) scale(0.707)"><use data-c="2032" xlink:href="#MJX-TEX-V-2032"></use></g></g><g data-mml-node="mo" transform="translate(1238.5,0)"><use data-c="2C" xlink:href="#MJX-TEX-N-2C"></use></g><g data-mml-node="msup" transform="translate(1683.1,0)"><g data-mml-node="mi"><use data-c="1D466" xlink:href="#MJX-TEX-I-1D466"></use></g><g data-mml-node="mo" transform="translate(523,363) scale(0.707)"><use data-c="2032" xlink:href="#MJX-TEX-V-2032"></use></g></g><g data-mml-node="mo" transform="translate(2450.6,0)"><use data-c="29" xlink:href="#MJX-TEX-N-29"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo stretchy="false">(</mo><msup><mi>x</mi><mo data-mjx-alternate="1">′</mo></msup><mo>,</mo><msup><mi>y</mi><mo data-mjx-alternate="1">′</mo></msup><mo stretchy="false">)</mo></math></mjx-assistive-mml></mjx-container> to the current position vector at each frame - and setting the resultant vector as the new position vector for the next frame - we can produce a simulation / animation of an object moving from A to B along a straight line.</p>
+<p>Similarly, any other quantity in motion phenomena that has both magnitude and direction will also be represented through vectors in our simulations.<br>
+This also allows manipulation and interaction of these different quantities - force (Gravitation, friction), acceleration, velocity, position through the means of vector addition, subtraction and scalar multiplication as follows:</p>
+<p>In one frame (1 unit of time) given that our object is at current position, current velocity</p>
+<ol>
+<li>
+<p>Suppose we have external forces <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.464ex;" xmlns="http://www.w3.org/2000/svg" width="5.199ex" height="2.059ex" role="img" focusable="false" viewBox="0 -705 2297.8 910" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msub"><g data-mml-node="mi"><use data-c="1D453" xlink:href="#MJX-TEX-I-1D453"></use></g><g data-mml-node="mn" transform="translate(523,-150) scale(0.707)"><use data-c="31" xlink:href="#MJX-TEX-N-31"></use></g></g><g data-mml-node="mo" transform="translate(926.6,0)"><use data-c="2C" xlink:href="#MJX-TEX-N-2C"></use></g><g data-mml-node="msub" transform="translate(1371.2,0)"><g data-mml-node="mi"><use data-c="1D453" xlink:href="#MJX-TEX-I-1D453"></use></g><g data-mml-node="mn" transform="translate(523,-150) scale(0.707)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>f</mi><mn>1</mn></msub><mo>,</mo><msub><mi>f</mi><mn>2</mn></msub></math></mjx-assistive-mml></mjx-container>, then by the second law of motion, we have:<br>
+acceleration = (<mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="10.956ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 4842.6 1000" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msub"><g data-mml-node="mi"><use data-c="1D453" xlink:href="#MJX-TEX-I-1D453"></use></g><g data-mml-node="mn" transform="translate(523,-150) scale(0.707)"><use data-c="31" xlink:href="#MJX-TEX-N-31"></use></g></g><g data-mml-node="mo" transform="translate(1148.8,0)"><use data-c="2B" xlink:href="#MJX-TEX-N-2B"></use></g><g data-mml-node="msub" transform="translate(2149,0)"><g data-mml-node="mi"><use data-c="1D453" xlink:href="#MJX-TEX-I-1D453"></use></g><g data-mml-node="mn" transform="translate(523,-150) scale(0.707)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g></g><g data-mml-node="mo" transform="translate(3075.6,0)"><use data-c="29" xlink:href="#MJX-TEX-N-29"></use></g><g data-mml-node="TeXAtom" data-mjx-texclass="ORD" transform="translate(3464.6,0)"><g data-mml-node="mo"><use data-c="2F" xlink:href="#MJX-TEX-N-2F"></use></g></g><g data-mml-node="mi" transform="translate(3964.6,0)"><use data-c="1D45A" xlink:href="#MJX-TEX-I-1D45A"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>f</mi><mn>1</mn></msub><mo>+</mo><msub><mi>f</mi><mn>2</mn></msub><mo stretchy="false">)</mo><mrow data-mjx-texclass="ORD"><mo>/</mo></mrow><mi>m</mi></math></mjx-assistive-mml></mjx-container> = sum of external forces / mass</p>
+</li>
+<li>
+<p>(New Velocity - Current velocity) / time = acceleration, which implies<br>
+New velocity = Current velocity + Acceleration</p>
+</li>
+<li>
+<p>Similarly, New position = Current position + new velocity</p>
+</li>
+<li>
+<p>Draw our next frame with the object in New position, and repeat from 1. unless explicitly stopped</p>
+</li>
+</ol>
+<p>The above method is commonly known as Euler Integration, although it is not the most accurate method that is used for describing continuous motion, it is good enough for the motion phenomena that were simulated for the project. This is mostly because our major requirements are smoothness - visually, and easy implementation - computationally.<br>
+It is likely that the above conditions are met because the change in quantities over each frame is relatively small, the errors - and hence the departure from real-life behaviour is visually minimal.</p>
+<p>(Intend to add a picture that shows difference between curve that results from Euler-integration and the actual integral curve - and see what happens when step size is small)</p>
+<p>Therefore, the above sequence works as a model of simulating dynamics of physical objects - with an explicit usage of the 2<sup>nd</sup> law, and an implicit use of the 1<sup>st</sup> law of motion - where an object’s velocity will not change unless an external force acts on it.</p>
+<p>The choice of using forces active in every frame to compute a new position for the next frame, allows us to model multiple kinds of forces, within the same structure (the loop). Eg: constant forces in the environment - gravity, changing forces in simulation - wind force, activated forces under condition - friction, buoyancy.</p>
+<h2>1.3 Implementation</h2>
+<h3>1.3.1: Moving object along a straight line</h3>
+<p>To draw a circle at the position <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="5.169ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 2284.7 1000" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><use data-c="28" xlink:href="#MJX-TEX-N-28"></use></g><g data-mml-node="mi" transform="translate(389,0)"><use data-c="1D465" xlink:href="#MJX-TEX-I-1D465"></use></g><g data-mml-node="mo" transform="translate(961,0)"><use data-c="2C" xlink:href="#MJX-TEX-N-2C"></use></g><g data-mml-node="mi" transform="translate(1405.7,0)"><use data-c="1D466" xlink:href="#MJX-TEX-I-1D466"></use></g><g data-mml-node="mo" transform="translate(1895.7,0)"><use data-c="29" xlink:href="#MJX-TEX-N-29"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></math></mjx-assistive-mml></mjx-container> with diameter d on our canvas, we use the built-in <strong>p5</strong> function <code>circle(x, y, d)</code></p>
+<pre><code>function setup(){  
+    createCanvas( windowWidth, windowHeight );  
+    background( 225 );  
+    circle(10, 250, 50);  
+}
+</code></pre>
+<p>Now to move the circle from the centre of the screen (width/2 height/2) to say 400 px to the right then we write the following code</p>
+<pre tabindex="0" class="code-block"><code class="language-js"><span class="token keyword">let</span> x_coord
+<span class="token keyword">let</span> y_coord 
+<span class="token keyword">let</span> timeTaken
+<span class="token keyword">let</span> speed
+
+<span class="token keyword">function</span> <span class="token function">setup</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">createCanvas</span><span class="token punctuation">(</span>windowWidth<span class="token punctuation">,</span> windowHeight<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">background</span><span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">fill</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  x_coord <span class="token operator">=</span> width<span class="token operator">/</span><span class="token number">2</span><span class="token punctuation">;</span>
+  y_coord <span class="token operator">=</span> height<span class="token operator">/</span><span class="token number">2</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Change the time taken here (in #frames), to see how it affects the animation</span>
+  <span class="token comment">// Note that this implementation is not used in our simulation below</span>
+  <span class="token comment">// This is just to show other ways of input that is possible</span>
+  timeTaken <span class="token operator">=</span> <span class="token function">prompt</span><span class="token punctuation">(</span><span class="token string">"Enter the time taken (in px) for the circle to move"</span><span class="token punctuation">,</span> <span class="token number">400</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  speed <span class="token operator">=</span> <span class="token number">400</span><span class="token operator">/</span>timeTaken
+
+  <span class="token function">circle</span><span class="token punctuation">(</span>x_coord<span class="token punctuation">,</span> y_coord<span class="token punctuation">,</span> <span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">function</span> <span class="token function">draw</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment">// If condition used here to stop the draw loop() after we have arrived at our destination</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>x_coord <span class="token operator">&lt;=</span> width<span class="token operator">/</span><span class="token number">2</span> <span class="token operator">+</span> <span class="token number">400</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token function">background</span><span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// Since we are only moving along x-axis, we can ignore the y-coordinate</span>
+    x_coord <span class="token operator">+=</span> speed<span class="token punctuation">;</span>
+    <span class="token comment">// If we want to move to a location that is not along either axis relative to initial position</span>
+    <span class="token comment">// Then we would have to calculate the slope of the line joining the locations and</span>
+    <span class="token comment">// use that to manipulate the y-coord i.e., </span>
+    <span class="token comment">// y_coord += slope * speed;   [where slope = change in y / change in x]</span>
+
+    <span class="token function">circle</span><span class="token punctuation">(</span>x_coord<span class="token punctuation">,</span> y_coord<span class="token punctuation">,</span> <span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment">// `noLoop()` will stop the draw loop</span>
+  <span class="token keyword">else</span><span class="token punctuation">{</span> <span class="token function">noLoop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<div class="simulation-container">
+  <div id="sec1" class="interactive-sketch"></div>
+  <div id="interactive-controls-sec1" class="interactive-panel"></div>
+  <div class="control-buttons">
+    <button onclick="pauseButtonToggle(this, sec1Sketch);">Play</button> 
+    <button onclick="sec1Sketch.initializeSketch();">Reset</button>
+  </div>
+</div>
+
+  <h3>1.3.2 Vector implementation:</h3>
+<p>To create a of vector object (which is called <strong>p5.Vector</strong> internally in <strong>p5</strong>) we use:<br>
+let vec = <code>createVector(30, 200)</code><br>
+Thus vec represents the position vector pointing from the origin to (30, 200)</p>
+<p><em>Basic Vector operations:</em><br>
+Where v1, v2 are vectors and a is a real number</p>
+<ul>
+<li><mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.339ex;" xmlns="http://www.w3.org/2000/svg" width="6.936ex" height="1.658ex" role="img" focusable="false" viewBox="0 -583 3065.6 733" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msub"><g data-mml-node="mi"><use data-c="1D463" xlink:href="#MJX-TEX-I-1D463"></use></g><g data-mml-node="mn" transform="translate(518,-150) scale(0.707)"><use data-c="31" xlink:href="#MJX-TEX-N-31"></use></g></g><g data-mml-node="mo" transform="translate(1143.8,0)"><use data-c="2B" xlink:href="#MJX-TEX-N-2B"></use></g><g data-mml-node="msub" transform="translate(2144,0)"><g data-mml-node="mi"><use data-c="1D463" xlink:href="#MJX-TEX-I-1D463"></use></g><g data-mml-node="mn" transform="translate(518,-150) scale(0.707)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>v</mi><mn>1</mn></msub><mo>+</mo><msub><mi>v</mi><mn>2</mn></msub></math></mjx-assistive-mml></mjx-container> : <code>v1.add(v2)</code></li>
+<li><mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.339ex;" xmlns="http://www.w3.org/2000/svg" width="6.936ex" height="1.658ex" role="img" focusable="false" viewBox="0 -583 3065.6 733" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msub"><g data-mml-node="mi"><use data-c="1D463" xlink:href="#MJX-TEX-I-1D463"></use></g><g data-mml-node="mn" transform="translate(518,-150) scale(0.707)"><use data-c="31" xlink:href="#MJX-TEX-N-31"></use></g></g><g data-mml-node="mo" transform="translate(1143.8,0)"><use data-c="2212" xlink:href="#MJX-TEX-N-2212"></use></g><g data-mml-node="msub" transform="translate(2144,0)"><g data-mml-node="mi"><use data-c="1D463" xlink:href="#MJX-TEX-I-1D463"></use></g><g data-mml-node="mn" transform="translate(518,-150) scale(0.707)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>v</mi><mn>1</mn></msub><mo>−</mo><msub><mi>v</mi><mn>2</mn></msub></math></mjx-assistive-mml></mjx-container>  : <code>v1.sub(v2)</code></li>
+<li><mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.339ex;" xmlns="http://www.w3.org/2000/svg" width="5.419ex" height="1.391ex" role="img" focusable="false" viewBox="0 -465 2395 615" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><use data-c="1D44E" xlink:href="#MJX-TEX-I-1D44E"></use></g><g data-mml-node="mo" transform="translate(751.2,0)"><use data-c="2217" xlink:href="#MJX-TEX-N-2217"></use></g><g data-mml-node="msub" transform="translate(1473.4,0)"><g data-mml-node="mi"><use data-c="1D463" xlink:href="#MJX-TEX-I-1D463"></use></g><g data-mml-node="mn" transform="translate(518,-150) scale(0.707)"><use data-c="31" xlink:href="#MJX-TEX-N-31"></use></g></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>a</mi><mo>∗</mo><msub><mi>v</mi><mn>1</mn></msub></math></mjx-assistive-mml></mjx-container> : <code> v1.mult(a)</code></li>
+<li><mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="9.441ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 4173 1000" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mn"><use data-c="31" xlink:href="#MJX-TEX-N-31"></use></g><g data-mml-node="TeXAtom" data-mjx-texclass="ORD" transform="translate(500,0)"><g data-mml-node="mo"><use data-c="2F" xlink:href="#MJX-TEX-N-2F"></use></g></g><g data-mml-node="mi" transform="translate(1000,0)"><use data-c="1D44E" xlink:href="#MJX-TEX-I-1D44E"></use></g><g data-mml-node="mo" transform="translate(1751.2,0)"><use data-c="2217" xlink:href="#MJX-TEX-N-2217"></use></g><g data-mml-node="mo" transform="translate(2473.4,0)"><use data-c="28" xlink:href="#MJX-TEX-N-28"></use></g><g data-mml-node="msub" transform="translate(2862.4,0)"><g data-mml-node="mi"><use data-c="1D463" xlink:href="#MJX-TEX-I-1D463"></use></g><g data-mml-node="mn" transform="translate(518,-150) scale(0.707)"><use data-c="31" xlink:href="#MJX-TEX-N-31"></use></g></g><g data-mml-node="mo" transform="translate(3784,0)"><use data-c="29" xlink:href="#MJX-TEX-N-29"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn><mrow data-mjx-texclass="ORD"><mo>/</mo></mrow><mi>a</mi><mo>∗</mo><mo stretchy="false">(</mo><msub><mi>v</mi><mn>1</mn></msub><mo stretchy="false">)</mo></math></mjx-assistive-mml></mjx-container> : <code>v1.div(a)</code></li>
+<li><mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.564ex;" xmlns="http://www.w3.org/2000/svg" width="4.601ex" height="2.26ex" role="img" focusable="false" viewBox="0 -749.5 2033.6 999" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo" transform="translate(0 -0.5)"><use data-c="7C" xlink:href="#MJX-TEX-N-7C"></use></g><g data-mml-node="mo" transform="translate(278,0) translate(0 -0.5)"><use data-c="7C" xlink:href="#MJX-TEX-N-7C"></use></g><g data-mml-node="msub" transform="translate(556,0)"><g data-mml-node="mi"><use data-c="1D463" xlink:href="#MJX-TEX-I-1D463"></use></g><g data-mml-node="mn" transform="translate(518,-150) scale(0.707)"><use data-c="31" xlink:href="#MJX-TEX-N-31"></use></g></g><g data-mml-node="mo" transform="translate(1477.6,0) translate(0 -0.5)"><use data-c="7C" xlink:href="#MJX-TEX-N-7C"></use></g><g data-mml-node="mo" transform="translate(1755.6,0) translate(0 -0.5)"><use data-c="7C" xlink:href="#MJX-TEX-N-7C"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo data-mjx-texclass="ORD" stretchy="false">|</mo><mo data-mjx-texclass="ORD" stretchy="false">|</mo><msub><mi>v</mi><mn>1</mn></msub><mo data-mjx-texclass="ORD" stretchy="false">|</mo><mo data-mjx-texclass="ORD" stretchy="false">|</mo></math></mjx-assistive-mml></mjx-container> : <code>v_1.mag()</code></li>
+<li><mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="9.577ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 4233.1 1000" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><use data-c="28" xlink:href="#MJX-TEX-N-28"></use></g><g data-mml-node="msub" transform="translate(389,0)"><g data-mml-node="mi"><use data-c="1D463" xlink:href="#MJX-TEX-I-1D463"></use></g><g data-mml-node="mn" transform="translate(518,-150) scale(0.707)"><use data-c="31" xlink:href="#MJX-TEX-N-31"></use></g></g><g data-mml-node="mo" transform="translate(1310.6,0)"><use data-c="29" xlink:href="#MJX-TEX-N-29"></use></g><g data-mml-node="TeXAtom" data-mjx-texclass="ORD" transform="translate(1699.6,0)"><g data-mml-node="mo"><use data-c="2F" xlink:href="#MJX-TEX-N-2F"></use></g></g><g data-mml-node="mo" transform="translate(2199.6,0) translate(0 -0.5)"><use data-c="7C" xlink:href="#MJX-TEX-N-7C"></use></g><g data-mml-node="mo" transform="translate(2477.6,0) translate(0 -0.5)"><use data-c="7C" xlink:href="#MJX-TEX-N-7C"></use></g><g data-mml-node="msub" transform="translate(2755.6,0)"><g data-mml-node="mi"><use data-c="1D463" xlink:href="#MJX-TEX-I-1D463"></use></g><g data-mml-node="mn" transform="translate(518,-150) scale(0.707)"><use data-c="31" xlink:href="#MJX-TEX-N-31"></use></g></g><g data-mml-node="mo" transform="translate(3677.1,0) translate(0 -0.5)"><use data-c="7C" xlink:href="#MJX-TEX-N-7C"></use></g><g data-mml-node="mo" transform="translate(3955.1,0) translate(0 -0.5)"><use data-c="7C" xlink:href="#MJX-TEX-N-7C"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo stretchy="false">(</mo><msub><mi>v</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mrow data-mjx-texclass="ORD"><mo>/</mo></mrow><mo data-mjx-texclass="ORD" stretchy="false">|</mo><mo data-mjx-texclass="ORD" stretchy="false">|</mo><msub><mi>v</mi><mn>1</mn></msub><mo data-mjx-texclass="ORD" stretchy="false">|</mo><mo data-mjx-texclass="ORD" stretchy="false">|</mo></math></mjx-assistive-mml></mjx-container> : <code>v1.normalise() </code></li>
+<li>Random vector from unit circle - <code> p5.Vector.random2D()</code></li>
+</ul>
+<p>Note that in <code>v1.function()</code> , <code>function()</code> is called as a method of the class. Any name that appears as v1*.name* is a property of the class that v1 represents, the ‘ . ’ allows us to access those properties - thus we are able to call methods like <code>add()</code> since they belong to the p5.Vector class. To view all the methods please check the <a href="https://p5js.org/reference/p5/p5.Vector/">p5 reference</a>.</p>
+<h3>1.3.3 Physical entities and classes:</h3>
+<p>We will implement physical entities (i.e., laws of physics obeying objects)  with the help of a Mover class - Classes are how we define a new type of object in <strong>js</strong> and give it structure - with its own properties and functions.</p>
+<p>Below is an example of how the class is implemented, where we are trying to simulate a ball, bouncing around in an enclosed space. Parameters and characteristics of the simulation are:</p>
+<ol>
+<li>Canvas size - <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.05ex;" xmlns="http://www.w3.org/2000/svg" width="9.553ex" height="1.581ex" role="img" focusable="false" viewBox="0 -677 4222.4 699" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mn"><use data-c="35" xlink:href="#MJX-TEX-N-35"></use><use data-c="30" xlink:href="#MJX-TEX-N-30" transform="translate(500,0)"></use><use data-c="30" xlink:href="#MJX-TEX-N-30" transform="translate(1000,0)"></use></g><g data-mml-node="mo" transform="translate(1722.2,0)"><use data-c="D7" xlink:href="#MJX-TEX-N-D7"></use></g><g data-mml-node="mn" transform="translate(2722.4,0)"><use data-c="34" xlink:href="#MJX-TEX-N-34"></use><use data-c="30" xlink:href="#MJX-TEX-N-30" transform="translate(500,0)"></use><use data-c="30" xlink:href="#MJX-TEX-N-30" transform="translate(1000,0)"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>500</mn><mo>×</mo><mn>400</mn></math></mjx-assistive-mml></mjx-container> - chose so that the ball may hit the edges more often</li>
+<li>Initial velocity = <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="6.789ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 3000.7 1000" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><use data-c="28" xlink:href="#MJX-TEX-N-28"></use></g><g data-mml-node="mn" transform="translate(389,0)"><use data-c="33" xlink:href="#MJX-TEX-N-33"></use></g><g data-mml-node="mo" transform="translate(889,0)"><use data-c="2C" xlink:href="#MJX-TEX-N-2C"></use></g><g data-mml-node="mo" transform="translate(1333.7,0)"><use data-c="2212" xlink:href="#MJX-TEX-N-2212"></use></g><g data-mml-node="mn" transform="translate(2111.7,0)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g><g data-mml-node="mo" transform="translate(2611.7,0)"><use data-c="29" xlink:href="#MJX-TEX-N-29"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo stretchy="false">(</mo><mn>3</mn><mo>,</mo><mo>−</mo><mn>2</mn><mo stretchy="false">)</mo></math></mjx-assistive-mml></mjx-container> px/f - roughly simulates just tossing a ball towards a wall</li>
+<li>Collision with walls, floor - inelastic in nature</li>
+</ol>
+<p>The constants - friction coefficient, gravitational acceleration, percentage of energy lost in after wall-collision are all chosen after experimentation with the visualisation produced by each of these quantities.<br>
+The mass of the object is an arbitrary quantity - only there to determine the size of the object and scaling of gravitational force. Note that we increase the gravitational force for heavier objects, in order to simulate what we see in usual environments - heavier objects fall faster relative to lighter ones (although this isn’t because of gravitation but rather other external forces like air resistance).</p>
+<p>This is the basic structure of our class:</p>
+<pre tabindex="0" class="code-block"><code class="language-js"><span class="token comment">// Program to simulate a bouncing ball under the influence of gravity and frictional forces</span>
+<span class="token keyword">class</span> <span class="token class-name">Mover</span> <span class="token punctuation">{</span>
+  <span class="token comment">/* This is the syntax for creating a class, now within this block 
+  we can define and attach properties and functions (methods) to the class
+  by using the 'this' keyword */</span>
+
+  <span class="token comment">// The constructor sets the initial values that are required after instantiation</span>
+  <span class="token comment">// for the Mover class we require, x and y coordinates, and mass of the object</span>
+
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">x<span class="token punctuation">,</span> y<span class="token punctuation">,</span> m</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// The velocity chosen such that it showcases all the features of the program</span>
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span>pos <span class="token operator">=</span> <span class="token function">createVector</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>vel <span class="token operator">=</span> <span class="token function">createVector</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>acc <span class="token operator">=</span> <span class="token function">createVector</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment">// Creates a vector of default values (0,0)</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>mass <span class="token operator">=</span> m<span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>r <span class="token operator">=</span> m <span class="token operator">*</span> <span class="token number">0.875</span><span class="token punctuation">;</span>   <span class="token comment">// Object radius ∝ mass - i.e., assuming bigger ⇒ heavier</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token constant">D</span> <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>r <span class="token operator">*</span> <span class="token number">2</span><span class="token punctuation">;</span>    <span class="token comment">// Diameter - used as argument for drawing circle</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment">// Inside classes, function/methods don't need the 'function' keyword,</span>
+  <span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// The below three lines implement the physical laws as sequenced in the modelling section</span>
+    <span class="token comment">// This implementation will be used throughout all simulations as part of the update() method</span>
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>acc<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>acc<span class="token punctuation">.</span><span class="token function">mult</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>       <span class="token comment">//Acceleration is reset - only affected by force(s) at that frame</span>
+
+    <span class="token comment">// bounceEdges() is called after the reset, since the effect of friction</span>
+    <span class="token comment">// applied in bounceEdges() is only used in the next frame </span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">bounceEdges</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">circle</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>x<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>y<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token constant">D</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token function">applyForce</span><span class="token punctuation">(</span><span class="token parameter">force</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// Since gravitational acceleration is constant, we have to create a copy</span>
+    <span class="token comment">// And apply second law to the copied vector</span>
+    <span class="token keyword">let</span> f <span class="token operator">=</span> p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">div</span><span class="token punctuation">(</span>force<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>mass<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>acc<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>f<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token function">bounceEdges</span><span class="token punctuation">(</span><span class="token parameter">fric_Force <span class="token operator">=</span> <span class="token boolean">true</span></span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>y <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>r <span class="token operator">&gt;</span> height<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">.</span>y <span class="token operator">*=</span> <span class="token operator">-</span><span class="token number">0.85</span><span class="token punctuation">;</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>y <span class="token operator">+=</span> height <span class="token operator">-</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>y <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>r<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>fric_Force<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// Formula used is fric = µN (-û) where </span>
+        <span class="token comment">// µ - frictional coeffecient, N- Normal force, û - unit vector along current velocity </span>
+        <span class="token comment">// Basically friction is a force acting along the opposite direction of the velocity</span>
+
+        <span class="token keyword">let</span> fric <span class="token operator">=</span> p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">setMag</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">,</span> fric_coeff<span class="token punctuation">)</span><span class="token punctuation">;</span> 
+        fric<span class="token punctuation">.</span><span class="token function">mult</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">applyForce</span><span class="token punctuation">(</span>fric<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>y <span class="token operator">-</span> <span class="token keyword">this</span><span class="token punctuation">.</span>r <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">.</span>y <span class="token operator">*=</span> <span class="token operator">-</span><span class="token number">0.85</span><span class="token punctuation">;</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>y <span class="token operator">-=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>y <span class="token operator">-</span> <span class="token keyword">this</span><span class="token punctuation">.</span>r
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>x <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>r <span class="token operator">&gt;</span> width<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">.</span>x <span class="token operator">*=</span> <span class="token operator">-</span><span class="token number">0.95</span><span class="token punctuation">;</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>x <span class="token operator">+=</span> width <span class="token operator">-</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>x <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>r<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>x <span class="token operator">-</span> <span class="token keyword">this</span><span class="token punctuation">.</span>r <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">.</span>x <span class="token operator">*=</span> <span class="token operator">-</span><span class="token number">0.95</span><span class="token punctuation">;</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>x <span class="token operator">-=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>x <span class="token operator">-</span> <span class="token keyword">this</span><span class="token punctuation">.</span>r<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">let</span> mv<span class="token punctuation">;</span>   <span class="token comment">// The mover instance decleration</span>
+<span class="token keyword">let</span> gravity<span class="token punctuation">;</span>
+<span class="token keyword">const</span> fric_coeff <span class="token operator">=</span> <span class="token number">0.075</span><span class="token punctuation">;</span>
+
+<span class="token keyword">function</span> <span class="token function">setup</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">createCanvas</span><span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">,</span> <span class="token number">400</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">fill</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  gravity <span class="token operator">=</span> <span class="token function">createVector</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0.1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  mv <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Mover</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> <span class="token number">80</span><span class="token punctuation">,</span> <span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token punctuation">}</span>
+
+<span class="token keyword">function</span> <span class="token function">draw</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">background</span><span class="token punctuation">(</span><span class="token number">220</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  mv<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Applying any universal forces in the simulation - in this case just gravity</span>
+  <span class="token comment">// But since grativational force actually scales according to mass, we pass a new vector at each frame</span>
+  <span class="token comment">// i.e., our constant gravity vector multiplied by the mass of the mover</span>
+  mv<span class="token punctuation">.</span><span class="token function">applyForce</span><span class="token punctuation">(</span>p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">mult</span><span class="token punctuation">(</span>gravity<span class="token punctuation">,</span> mv<span class="token punctuation">.</span>mass<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+
+  mv<span class="token punctuation">.</span><span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token punctuation">}</span></code></pre>
+<p>This structure serves as a template for any kind of moving object - a method to display our mover, a method to update its position - using the 2<sup>nd</sup> law, and other methods that take care of detecting and processing forces.</p>
+<p>This is how an instance of the object is made and used in our sketches:</p>
+<pre tabindex="0" class="code-block"><code class="language-js"><span class="token keyword">let</span> mv<span class="token punctuation">;</span>   <span class="token comment">// The mover instance decleration</span>
+<span class="token keyword">let</span> gravity<span class="token punctuation">;</span>
+<span class="token keyword">const</span> fric_coeff <span class="token operator">=</span> <span class="token number">0.075</span><span class="token punctuation">;</span>
+
+<span class="token keyword">function</span> <span class="token function">setup</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">createCanvas</span><span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">,</span> <span class="token number">400</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">fill</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  gravity <span class="token operator">=</span> <span class="token function">createVector</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0.1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  mv <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Mover</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> <span class="token number">80</span><span class="token punctuation">,</span> <span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token punctuation">}</span>
+
+<span class="token keyword">function</span> <span class="token function">draw</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">background</span><span class="token punctuation">(</span><span class="token number">220</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  mv<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Applying any universal forces in the simulation - in this case just gravity</span>
+  <span class="token comment">// But since grativational force actually scales according to mass, we pass a new vector at each frame</span>
+  <span class="token comment">// i.e., our constant gravity vector multiplied by the mass of the mover</span>
+  mv<span class="token punctuation">.</span><span class="token function">applyForce</span><span class="token punctuation">(</span>p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">mult</span><span class="token punctuation">(</span>gravity<span class="token punctuation">,</span> mv<span class="token punctuation">.</span>mass<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+
+  mv<span class="token punctuation">.</span><span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token punctuation">}</span></code></pre>
+<p>Where <code>mv = new Mover(200, 80, 20)</code> is the syntax to create an object of type Mover and <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.186ex;" xmlns="http://www.w3.org/2000/svg" width="7.705ex" height="1.692ex" role="img" focusable="false" viewBox="0 -666 3405.6 748" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><use data-c="1D465" xlink:href="#MJX-TEX-I-1D465"></use></g><g data-mml-node="mo" transform="translate(849.8,0)"><use data-c="3D" xlink:href="#MJX-TEX-N-3D"></use></g><g data-mml-node="mn" transform="translate(1905.6,0)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use><use data-c="30" xlink:href="#MJX-TEX-N-30" transform="translate(500,0)"></use><use data-c="30" xlink:href="#MJX-TEX-N-30" transform="translate(1000,0)"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>=</mo><mn>200</mn></math></mjx-assistive-mml></mjx-container>, <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.464ex;" xmlns="http://www.w3.org/2000/svg" width="6.388ex" height="1.971ex" role="img" focusable="false" viewBox="0 -666 2823.6 871" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><use data-c="1D466" xlink:href="#MJX-TEX-I-1D466"></use></g><g data-mml-node="mo" transform="translate(767.8,0)"><use data-c="3D" xlink:href="#MJX-TEX-N-3D"></use></g><g data-mml-node="mn" transform="translate(1823.6,0)"><use data-c="38" xlink:href="#MJX-TEX-N-38"></use><use data-c="30" xlink:href="#MJX-TEX-N-30" transform="translate(500,0)"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>y</mi><mo>=</mo><mn>80</mn></math></mjx-assistive-mml></mjx-container> and mass <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.186ex;" xmlns="http://www.w3.org/2000/svg" width="4.651ex" height="1.692ex" role="img" focusable="false" viewBox="0 -666 2055.8 748" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><use data-c="3D" xlink:href="#MJX-TEX-N-3D"></use></g><g data-mml-node="mn" transform="translate(1055.8,0)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use><use data-c="30" xlink:href="#MJX-TEX-N-30" transform="translate(500,0)"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>=</mo><mn>20</mn></math></mjx-assistive-mml></mjx-container> is passed to the constructor, which then creates all the initial required values.</p>
+<p>Now the main method, that takes care of processing forces - is applyForce()</p>
+<pre tabindex="0" class="code-block"><code class="language-js">  <span class="token function">applyForce</span><span class="token punctuation">(</span><span class="token parameter">force</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// Since gravitational acceleration is constant, we have to create a copy</span>
+    <span class="token comment">// And apply second law to the copied vector</span>
+    <span class="token keyword">let</span> f <span class="token operator">=</span> p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">div</span><span class="token punctuation">(</span>force<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>mass<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>acc<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>f<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span></code></pre>
+<p>Here <code>p5.Vector.div()</code> is a static method. Static methods are used when we want to return a new instance of the Class using an already existing instance (here f is used) over manipulating property values of that particular instance ( then we will use <code>f.div()</code> ).</p>
+<p>The secondary method of our Mover class is the <code>bounceEdges()</code> method. It checks if at the next frame or the updated position before displaying is beyond the edges of the screen. If so, it repositions the object right at the edge, and reduces the velocity to simulate a inelastic collision</p>
+<pre tabindex="0" class="code-block"><code class="language-js">  <span class="token comment">// Implementation of above logic</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>x <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>r <span class="token operator">&gt;</span> width<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">.</span>x <span class="token operator">*=</span> <span class="token operator">-</span><span class="token number">0.95</span><span class="token punctuation">;</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>x <span class="token operator">+=</span> width <span class="token operator">-</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>x <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>r<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>x <span class="token operator">-</span> <span class="token keyword">this</span><span class="token punctuation">.</span>r <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">.</span>x <span class="token operator">*=</span> <span class="token operator">-</span><span class="token number">0.95</span><span class="token punctuation">;</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>x <span class="token operator">-=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>x <span class="token operator">-</span> <span class="token keyword">this</span><span class="token punctuation">.</span>r<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>and if the edge is the lower one (floor) then, we also inform my Mover, that frictional force must also be added, along with the other forces in the next frame through <code>this.applyForce(fric)</code>.<sup>4</sup></p>
+<pre tabindex="0" class="code-block"><code class="language-js"><span class="token function">bounceEdges</span><span class="token punctuation">(</span><span class="token parameter">fric_Force <span class="token operator">=</span> <span class="token boolean">true</span></span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment">/*
+  code from prev block goes here
+  ...
+  */</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>y <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>r <span class="token operator">&gt;</span> height<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">.</span>y <span class="token operator">*=</span> <span class="token operator">-</span><span class="token number">0.85</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>y <span class="token operator">+=</span> height <span class="token operator">-</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>y <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>r<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>fric_Force<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token comment">// Formula used is fric = µN (-û) where </span>
+      <span class="token comment">// µ - frictional coeffecient, N- Normal force, û - unit vector along current velocity </span>
+      <span class="token comment">// Basically friction is a force acting along the opposite direction of the velocity</span>
+
+      <span class="token keyword">let</span> fric <span class="token operator">=</span> p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">setMag</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">,</span> fric_coeff<span class="token punctuation">)</span><span class="token punctuation">;</span> 
+      fric<span class="token punctuation">.</span><span class="token function">mult</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">applyForce</span><span class="token punctuation">(</span>fric<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>In the above snippet, similar to <code>p5.Vector.div()</code>, here <code>p5.Vector.setMag(this.vel, fric_coeff)</code> - takes the the velocity of our object, and scales the magnitude to be fric_coeff.</p>
+<p>Putting it together we get this :)</p>
+<div class="simulation-container">
+  <div id="sec2" class="interactive-sketch"></div>
+  <div id="interactive-controls-sec2" class="interactive-panel"></div>
+  <div class="control-buttons">
+    <button onclick="pauseButtonToggle(this, sec2Sketch);">Play</button> 
+    <button onclick="sec2Sketch.initializeSketch();">Reset</button>
+  </div>
+</div>
+<h2>Notes:</h2>
+<ol>
+<li>
+<p>Using a circle would also simplify calculations to do with contact - enables us to ignore surface area in calculations we do.</p>
+</li>
+<li>
+<p>Although the scope of the nuances behind this claim is beyond this thesis, according to the current knowledge of visual processing, the information of shape, depth, colour and motion are handled separately and finally seen as an image to us. The speed at which this information can be processed therefore limits the ability to distinguish between two still images and one continuous motion. And this line seems to be drawn at around 10 to 12 images per second (i.e. 10-12 fps).<br>
+But the kind of motion we see depends on intensity and frequency of sustained light and length of darkness</p>
+<p>This is one of the numerous tricks that simulation uses - where the fundamental limits of ourselves help in decreasing required precision and therefore reducing computational overheads whenever possible. One can think of this as also discovering the required parameters of our simulation so that we can simulate real life-like motion to the extent needed. One more technique that makes use of the limits of our eye is anti-aliasing - allows us to define and use real coordinates in a discrete world</p>
+</li>
+<li>
+<p>Note that pixels in various contexts mean different things, but CSS sets a standard definition of relative pixel dimensions, which is used in <strong>JS</strong> and hence <strong>p5.js</strong> as well. Relative means that - if object travels 5 px/frame - regardless of absolute pixel resolution of two different monitors - it will cross a canvas of width 400 px in 80 frames</p>
+</li>
+<li>
+<p>Multiple other implementation orders were tried, but this is the one that with simplest, small code and the one that makes sure friction is only applied once when the ball is close to the ground</p>
+</li>
+</ol>
+
+
+
+<!-- Auto-load section scripts -->
+
+  <script src="/Honours-website-project/assets/scripts/chap1_01.js"></script>
+
+  <script src="/Honours-website-project/assets/scripts/chap1_02.js"></script>
+
+
+<svg style="display: none;" id="MJX-SVG-global-cache"><defs><path id="MJX-TEX-N-35" d="M164 157Q164 133 148 117T109 101H102Q148 22 224 22Q294 22 326 82Q345 115 345 210Q345 313 318 349Q292 382 260 382H254Q176 382 136 314Q132 307 129 306T114 304Q97 304 95 310Q93 314 93 485V614Q93 664 98 664Q100 666 102 666Q103 666 123 658T178 642T253 634Q324 634 389 662Q397 666 402 666Q410 666 410 648V635Q328 538 205 538Q174 538 149 544L139 546V374Q158 388 169 396T205 412T256 420Q337 420 393 355T449 201Q449 109 385 44T229 -22Q148 -22 99 32T50 154Q50 178 61 192T84 210T107 214Q132 214 148 197T164 157Z"></path><path id="MJX-TEX-I-1D465" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path><path id="MJX-TEX-N-28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path><path id="MJX-TEX-N-2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path><path id="MJX-TEX-I-1D466" d="M21 287Q21 301 36 335T84 406T158 442Q199 442 224 419T250 355Q248 336 247 334Q247 331 231 288T198 191T182 105Q182 62 196 45T238 27Q261 27 281 38T312 61T339 94Q339 95 344 114T358 173T377 247Q415 397 419 404Q432 431 462 431Q475 431 483 424T494 412T496 403Q496 390 447 193T391 -23Q363 -106 294 -155T156 -205Q111 -205 77 -183T43 -117Q43 -95 50 -80T69 -58T89 -48T106 -45Q150 -45 150 -87Q150 -107 138 -122T115 -142T102 -147L99 -148Q101 -153 118 -160T152 -167H160Q177 -167 186 -165Q219 -156 247 -127T290 -65T313 -9T321 21L315 17Q309 13 296 6T270 -6Q250 -11 231 -11Q185 -11 150 11T104 82Q103 89 103 113Q103 170 138 262T173 379Q173 380 173 381Q173 390 173 393T169 400T158 404H154Q131 404 112 385T82 344T65 302T57 280Q55 278 41 278H27Q21 284 21 287Z"></path><path id="MJX-TEX-N-29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path><path id="MJX-TEX-V-2032" d="M79 43Q73 43 52 49T30 61Q30 68 85 293T146 528Q161 560 198 560Q218 560 240 545T262 501Q262 496 260 486Q259 479 173 263T84 45T79 43Z"></path><path id="MJX-TEX-I-1D453" d="M118 -162Q120 -162 124 -164T135 -167T147 -168Q160 -168 171 -155T187 -126Q197 -99 221 27T267 267T289 382V385H242Q195 385 192 387Q188 390 188 397L195 425Q197 430 203 430T250 431Q298 431 298 432Q298 434 307 482T319 540Q356 705 465 705Q502 703 526 683T550 630Q550 594 529 578T487 561Q443 561 443 603Q443 622 454 636T478 657L487 662Q471 668 457 668Q445 668 434 658T419 630Q412 601 403 552T387 469T380 433Q380 431 435 431Q480 431 487 430T498 424Q499 420 496 407T491 391Q489 386 482 386T428 385H372L349 263Q301 15 282 -47Q255 -132 212 -173Q175 -205 139 -205Q107 -205 81 -186T55 -132Q55 -95 76 -78T118 -61Q162 -61 162 -103Q162 -122 151 -136T127 -157L118 -162Z"></path><path id="MJX-TEX-N-31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path><path id="MJX-TEX-N-32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path><path id="MJX-TEX-N-2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path><path id="MJX-TEX-N-2F" d="M423 750Q432 750 438 744T444 730Q444 725 271 248T92 -240Q85 -250 75 -250Q68 -250 62 -245T56 -231Q56 -221 230 257T407 740Q411 750 423 750Z"></path><path id="MJX-TEX-I-1D45A" d="M21 287Q22 293 24 303T36 341T56 388T88 425T132 442T175 435T205 417T221 395T229 376L231 369Q231 367 232 367L243 378Q303 442 384 442Q401 442 415 440T441 433T460 423T475 411T485 398T493 385T497 373T500 364T502 357L510 367Q573 442 659 442Q713 442 746 415T780 336Q780 285 742 178T704 50Q705 36 709 31T724 26Q752 26 776 56T815 138Q818 149 821 151T837 153Q857 153 857 145Q857 144 853 130Q845 101 831 73T785 17T716 -10Q669 -10 648 17T627 73Q627 92 663 193T700 345Q700 404 656 404H651Q565 404 506 303L499 291L466 157Q433 26 428 16Q415 -11 385 -11Q372 -11 364 -4T353 8T350 18Q350 29 384 161L420 307Q423 322 423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 181Q151 335 151 342Q154 357 154 369Q154 405 129 405Q107 405 92 377T69 316T57 280Q55 278 41 278H27Q21 284 21 287Z"></path><path id="MJX-TEX-I-1D463" d="M173 380Q173 405 154 405Q130 405 104 376T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Q21 294 29 316T53 368T97 419T160 441Q202 441 225 417T249 361Q249 344 246 335Q246 329 231 291T200 202T182 113Q182 86 187 69Q200 26 250 26Q287 26 319 60T369 139T398 222T409 277Q409 300 401 317T383 343T365 361T357 383Q357 405 376 424T417 443Q436 443 451 425T467 367Q467 340 455 284T418 159T347 40T241 -11Q177 -11 139 22Q102 54 102 117Q102 148 110 181T151 298Q173 362 173 380Z"></path><path id="MJX-TEX-N-2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path><path id="MJX-TEX-I-1D44E" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path><path id="MJX-TEX-N-2217" d="M229 286Q216 420 216 436Q216 454 240 464Q241 464 245 464T251 465Q263 464 273 456T283 436Q283 419 277 356T270 286L328 328Q384 369 389 372T399 375Q412 375 423 365T435 338Q435 325 425 315Q420 312 357 282T289 250L355 219L425 184Q434 175 434 161Q434 146 425 136T401 125Q393 125 383 131T328 171L270 213Q283 79 283 63Q283 53 276 44T250 35Q231 35 224 44T216 63Q216 80 222 143T229 213L171 171Q115 130 110 127Q106 124 100 124Q87 124 76 134T64 161Q64 166 64 169T67 175T72 181T81 188T94 195T113 204T138 215T170 230T210 250L74 315Q65 324 65 338Q65 353 74 363T98 374Q106 374 116 368T171 328L229 286Z"></path><path id="MJX-TEX-N-7C" d="M139 -249H137Q125 -249 119 -235V251L120 737Q130 750 139 750Q152 750 159 735V-235Q151 -249 141 -249H139Z"></path><path id="MJX-TEX-N-30" d="M96 585Q152 666 249 666Q297 666 345 640T423 548Q460 465 460 320Q460 165 417 83Q397 41 362 16T301 -15T250 -22Q224 -22 198 -16T137 16T82 83Q39 165 39 320Q39 494 96 585ZM321 597Q291 629 250 629Q208 629 178 597Q153 571 145 525T137 333Q137 175 145 125T181 46Q209 16 250 16Q290 16 318 46Q347 76 354 130T362 333Q362 478 354 524T321 597Z"></path><path id="MJX-TEX-N-D7" d="M630 29Q630 9 609 9Q604 9 587 25T493 118L389 222L284 117Q178 13 175 11Q171 9 168 9Q160 9 154 15T147 29Q147 36 161 51T255 146L359 250L255 354Q174 435 161 449T147 471Q147 480 153 485T168 490Q173 490 175 489Q178 487 284 383L389 278L493 382Q570 459 587 475T609 491Q630 491 630 471Q630 464 620 453T522 355L418 250L522 145Q606 61 618 48T630 29Z"></path><path id="MJX-TEX-N-34" d="M462 0Q444 3 333 3Q217 3 199 0H190V46H221Q241 46 248 46T265 48T279 53T286 61Q287 63 287 115V165H28V211L179 442Q332 674 334 675Q336 677 355 677H373L379 671V211H471V165H379V114Q379 73 379 66T385 54Q393 47 442 46H471V0H462ZM293 211V545L74 212L183 211H293Z"></path><path id="MJX-TEX-N-33" d="M127 463Q100 463 85 480T69 524Q69 579 117 622T233 665Q268 665 277 664Q351 652 390 611T430 522Q430 470 396 421T302 350L299 348Q299 347 308 345T337 336T375 315Q457 262 457 175Q457 96 395 37T238 -22Q158 -22 100 21T42 130Q42 158 60 175T105 193Q133 193 151 175T169 130Q169 119 166 110T159 94T148 82T136 74T126 70T118 67L114 66Q165 21 238 21Q293 21 321 74Q338 107 338 175V195Q338 290 274 322Q259 328 213 329L171 330L168 332Q166 335 166 348Q166 366 174 366Q202 366 232 371Q266 376 294 413T322 525V533Q322 590 287 612Q265 626 240 626Q208 626 181 615T143 592T132 580H135Q138 579 143 578T153 573T165 566T175 555T183 540T186 520Q186 498 172 481T127 463Z"></path><path id="MJX-TEX-N-3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path><path id="MJX-TEX-N-38" d="M70 417T70 494T124 618T248 666Q319 666 374 624T429 515Q429 485 418 459T392 417T361 389T335 371T324 363L338 354Q352 344 366 334T382 323Q457 264 457 174Q457 95 399 37T249 -22Q159 -22 101 29T43 155Q43 263 172 335L154 348Q133 361 127 368Q70 417 70 494ZM286 386L292 390Q298 394 301 396T311 403T323 413T334 425T345 438T355 454T364 471T369 491T371 513Q371 556 342 586T275 624Q268 625 242 625Q201 625 165 599T128 534Q128 511 141 492T167 463T217 431Q224 426 228 424L286 386ZM250 21Q308 21 350 55T392 137Q392 154 387 169T375 194T353 216T330 234T301 253T274 270Q260 279 244 289T218 306L210 311Q204 311 181 294T133 239T107 157Q107 98 150 60T250 21Z"></path></defs></svg></body>
+</html>

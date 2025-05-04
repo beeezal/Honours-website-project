@@ -27,9 +27,12 @@
 <li>The main goal of Schiffman is to teach (creative) coding techniques and algorithms and how to develop models in a basic object-oriented manner, through examples in natural phenomena. The main goal of this project is to understand motion phenomena better, and therefore, I focus on building up from every previous step to larger and larger models till the end of the project.</li>
 <li>This causes the implementation of ideas/algorithms to look different. Although Schiffman also builds on ideas previously visited, each topic/technique is itself isolated where there are references made to other parts, but the code is rewritten (sometimes changed to better suit the context). While code in this project is written with the intention of being modular/reusable, and if a piece of code needs to be rewritten, we will go back to the initial creation of it, and make it more general.</li>
 <li>Schiffman also ignores some coding conventions (for eg: variable naming), as the focus is to inculcate algorithmic thinking. But, in this project such conventions are more strictly followed because of the following reasons:
-a) I hope that this serves also as a resource for one to go from a beginner to an intermediate programmer, as I myself did. Therefore, attempting to inculcate good coding habits.
-b) To also make it easier to build on the work that has already been done in this project and make/suggest improvements to it. It is also more helpful when we are creating more abstracted code from observed patterns. Which is focused on my project to a higher degree and therefore help newer programmers learn how to do it as well as compared to Schiffman’s book.
-c) Finally, in [Schiffman 24], we mostly go from phenomena to code, but after the implementation, there is not much importance in going back and understanding the output simulation and. This is because the code written in [Schiffman 24] is the polished version and most improvements made to code are constructed over explored. Whereas in this project (especially in later stages) there is slightly more emphasis on this aspect. Where code improvements also sometimes come through exploration, this is also especially highlighted in the publicly available GitHub repository (<a href="https://github.com/beeezal/Honours-project-codes">see here</a> for this project - where one can view the commits and see the growth of code over time.</li>
+<ul>
+<li>I hope that this serves also as a resource for one to go from a beginner to an intermediate programmer, as I myself did. Therefore, attempting to inculcate good coding habits.</li>
+<li>To also make it easier to build on the work that has already been done in this project and make/suggest improvements to it. It is also more helpful when we are creating more abstracted code from observed patterns. Which is focused on my project to a higher degree and therefore help newer programmers learn how to do it as well as compared to Schiffman’s book.</li>
+<li>Finally, in [Schiffman 24], we mostly go from phenomena to code, but after the implementation, there is not much importance in going back and understanding the output simulation and. This is because the code written in [Schiffman 24] is the polished version and most improvements made to code are constructed over explored. Whereas in this project (especially in later stages) there is slightly more emphasis on this aspect. Where code improvements also sometimes come through exploration, this is also especially highlighted in the publicly available GitHub repository (<a href="https://github.com/beeezal/Honours-project-codes">see here</a> for this project - where one can view the commits and see the growth of code over time.</li>
+</ul>
+</li>
 </ol>
 <p>Therefore, in this project we are approaching the question of <em>“What makes life, life?”</em> through the lens of <em>motion</em> phenomena of physical entities and with the eyes of computer simulation. We take interest in motion phenomena because <em>natural</em> phenomena cover a broad area of topics, therefore focusing on a particular section of it lets us dive deeper into more elaborate models. Hence, providing further insight into the various characteristics (or components) of <em>natural</em> phenomena. <em>Motion</em> is also chosen because it integrates with animated simulations (i.e. the visualisation aspect) and Object Oriented Programming easily, which is the core engine of the simulations in this project, especially the p5.js library that we will be using.</p>
 <h2>Flow of content:</h2>
@@ -65,7 +68,7 @@ c) Finally, in [Schiffman 24], we mostly go from phenomena to code, but after th
 <li>
 <p>Part of all <strong>p5</strong> sketches:</p>
 <ul>
-<li><code>setup()</code>: is used to define the initial environment properties such as screen size and background color
+<li><code>setup()</code>: is used to define the initial environment properties such as screen size and background color<br>
 and creating any objects required in the programme. When p5.js library is used in our project, it calls the <code>setup()</code> function once in the beginning (automatically). And looks for the defintion of our <code>p5Canvas</code> element and the other properties as mentioned above.</li>
 <li><code>draw()</code> : is called repeatedly in a infinte loop. It is used to animate the objects on the canvas (explained in the next chapter)</li>
 </ul>
@@ -74,7 +77,7 @@ and creating any objects required in the programme. When p5.js library is used i
 <p>Therefore every <strong>p5</strong>-sketch at its core, has these two functions. With one or two more global functions - usually for handling <strong>HTML</strong> events like, <code>mousePressed</code>, <code>deviceMoved</code>, etc.</p>
 </li>
 <li>
-<p>We also have built-in ariables/constants with attached values/meaning - variables like <code>width</code>, <code>height</code>, <code>frameRate</code>, <code>frameCount</code>, etc., all containing their obvious meaining. The dimensional variables refer to the   <em>Canvas</em>.
+<p>We also have built-in ariables/constants with attached values/meaning - variables like <code>width</code>, <code>height</code>, <code>frameRate</code>, <code>frameCount</code>, etc., all containing their obvious meaining. The dimensional variables refer to the   <em>Canvas</em>.<br>
 For convenience we also have some mathematical constants such as <code>PI</code>, and its multiples like <code>QUARTER-PI</code> and <code>TWO-PI</code> (also called <code>TAU</code>)</p>
 </li>
 <li>

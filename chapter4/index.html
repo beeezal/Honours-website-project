@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> Individual Autonomous Behaviour </title>
+
+  
+  <link rel="stylesheet" type="text/css" href="/Honours-website-project/assets/cssStyle/generic.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer=""></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js" defer=""></script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+</head>
+
+<body>
+ 
+  
+<h1>Chapter 4</h1>
+<h1>Individual Autonomous Behaviour</h1>
+<hr>
+<!-- Shared utility function for pausing and resuming any sketch -->
+<script>  
+  let pauseButtonToggle = function (button, sketch) {
+    if (sketch.isLooping()) {
+      button.innerText = "Play";
+      sketch.noLoop();
+    } else {
+      button.innerText = "Pause";
+      sketch.loop();
+    }
+  }
+</script>
+<script src="/Honours-website-project/assets/scripts/mover1.js"></script>
+
+
+  <h2>4.1 Phenomena</h2>
+<p>So far we’ve only been dealing with motion phenomena that are either random or are controlled by external factors like user input or forces. But living beings not only have agency to move, but also are purpose-driven. This is what we usually mean when we say life-like motion.</p>
+<p>For example, take a scenario where a sheep has left its herd managed by a cowboy. This is our external stimuli. Now the cowboy would like to retrieve the lost sheep (the goal). So he would get on his horse and steer the horse through the terrain, both avoiding obstacles and moving towards the sheep as fast as possible. Then the movement of the horse, where the autonomy of its movement comes from the cowboy is life-like motion [Reynolds 99]</p>
+<p>Similarly, imagine a gazelle that is hungry (internal stimulus) in an open plain field. The movement of the gazelle about the field would reflect its desire to find and eat grass. And suppose a cheetah is nearby and the gazelle realises it. Now in order to survive the gazelle moves differently compared to when it was grazing.</p>
+<p>Therefore, to simulate such motion phenomena is essential.  That is we want to simulate entities that move in response to stimuli and/or an internal goal - agents that are autonomous in nature. A fundamental characteristic of such agents is that it does not know the exact path to take in order to achieve its goal(s). But rather at each instant of the situation / environment it is in, it will actively decide to move according to its goal.<br>
+For eg: the gazelle when evading the cheetah might be running straight for some time, but then suddenly turn, if it is a better option at that instant.</p>
+<p>This characteristic of autonomous behaviour will be the basis, in our attempts to simulate such behaviour.</p>
+<h2>4.2 Modelling</h2>
+<h3>4.2.1 Defining Autonomous Agents</h3>
+<p>As described in the previous , and from the name we can derive an intuitive definition that an entity that has both autonomy and agency is an autonomous agent (AA). They are entities that have the ability to act and react in its environment, independent of any external control or intervention.</p>
+<p>Now, the ability to act and react, means to change some state of the environment - be itself or some other component. Which requires two things:</p>
+<p>The ability to perceive at least some part of the environment - in order to react, the agent would first have to make some observation. When the agents are enabled for physical motion, this also implicitly implies that there are components other than the agent itself in the environment.<sup>1</sup></p>
+<p>The second is not always a necessary requirement, but given the context of motion phenomena / behaviours, the agent must be a part of the environment in order to act (move) in it.</p>
+<p>In order to differentiate between the AA of this project and a general AA, a classification must include these characteristics of our autonomous agents. Following suit of [Reynolds 99], we then classify our agents as,</p>
+<p><strong>Isolated or Situated</strong>:</p>
+<p>An agent is situated when there are other entities along with the agent in the environment. In other words, there is ‘something’ outside of the agent that is also part of the environment. This property enables the agent to interact with the environment. A chatbot, whose entire environment is its own screen (where all inputs are made part of the bot) is an isolated agent. A power grid controller is a situated agent, along with many other components of the grid</p>
+<p><strong>Embodied or Abstract</strong>:</p>
+<p>Embodiment essentially refers to the second requirement mentioned previously. It is the physical existence of the agent within the environment. For example, an email bot which filters out important and spam emails from your inbox need not have a physical presence, but is rather activated through some command / situation. Meanwhile, a vacuum cleaning robot can clean the environment (house) precisely because it exists in it.</p>
+<p><strong>Reactive or Deliberative</strong>:</p>
+<p>The difference between reactive and deliberative agents lies in its ability to reason and think about the response to given stimuli. The former does not possess such abilities - response is an immediate output, while the latter deliberates and learns to optimise its output.</p>
+<h3>4.2.2 Further Classification of our Autonomous Agents</h3>
+<p>Clearly, since we are handling autonomous agents that possess motion behaviours, our agents will fall under the categorisation situated, embodied and reactive. Here, by motion behaviour, we refer to the life-like motion of our entities.</p>
+<p>To further break down the process of simulating motion behaviours in autonomous agents, we use a model that contains three stages: action selection, steering behaviour and locomotion. Using the examples from  let's look at how these individual stages look.</p>
+<p><strong>Action Selection</strong> :<br>
+Involves goal setting, prioritizing in response to the environment. For the cowboy this was to pursue/find the sheep. For the gazelle, this was to eat when hungry and run away when chased by a cheetah.<br>
+For most cases, we will consider the chase and the grazing as two different simulations, but in some instances we will also look at combining these two behaviours and prioritize one over the other - when there is lack of threat the gazelle can focus on grazing, but when the cheetah is observed to be within some distance then the gazelle would prefer living over die eating, and hence prioritize running away.</p>
+<p><strong>Steering behaviours</strong> :<br>
+Involves path determination for the given goal. i.e., where to move in order to achieve the needs of the agent. Towards the stimuli - cowboy, or Away from the stimuli - gazelle, randomly - gazelle (while grazing).<br>
+In our models, all this boils down to calculating a Steering force (vector) according to which the agent will move to a new position (as modelled in ). This steering force takes into account two things - the current velocity and the desired velocity (which is selected according to the agent’s goal) [Reynolds 1999].<br>
+Then the steering force is just the amount of force (and therefore acceleration) that should be applied in order to change our velocity from the current towards the desired.</p>
+<p><strong>Locomotion</strong>:<br>
+Involves the <em>embodiment</em> of the agent itself - physical appearance, visualisation of steering behaviour, animation. Eg, the cowboy’s instruction to speed up can either be implemented to the horse by dynamic joints and muscles which will go from walking to galloping - simulating realistically the legged motion.<br>
+Or one can also simply animate a sequence of frames to provide the illusion of motion.</p>
+<p>But since the focus of this section is on <em>autonomy</em> itself, as long as the viewer is able to observe and agree that the motion (i.e., the change in position each frame) is perceived to be <em>autonomous</em> it does not matter what the actual mechanics of that motion is.</p>
+<p>Therefore, we will - as done till now - work with a circle, as an abstracted embodiment of our agents.</p>
+<h2>4.3 Implementation</h2>
+<p>First we shall implement the overall characteristics common to all agents of different motion behaviour by an abstract class AutonMover - which itself doesn’t contain a specific motion behaviour.</p>
+<h3>4.3.1 Implementation of the SER Characteristics:</h3>
+<p>Situatedness and Embodiment have already been built into our simulation. The agent becomes situated as soon as we define our canvas and initiate our agent in setup() as such:</p>
+<p><code>agent = new AutonMover(x, y, r)</code></p>
+<p>Embodiment follows from the properties assigned to the agent at construction - the size, initial velocity, acceleration and position of the agent.</p>
+<pre tabindex="0" class="code-block"><code class="language-js"><span class="token keyword">class</span> <span class="token class-name">AutonMover</span> <span class="token punctuation">{</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">x<span class="token punctuation">,</span> y<span class="token punctuation">,</span> r</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>r <span class="token operator">=</span> r<span class="token punctuation">;</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token constant">D</span> <span class="token operator">=</span> r <span class="token operator">*</span> <span class="token number">2</span><span class="token punctuation">;</span>   <span class="token comment">//Diameter of the particle - used in defining shapes </span>
+      
+      <span class="token keyword">this</span><span class="token punctuation">.</span>pos <span class="token operator">=</span> <span class="token function">createVector</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>vel <span class="token operator">=</span> p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">random2D</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>acc <span class="token operator">=</span> <span class="token function">createVector</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token operator">...</span>
+  <span class="token punctuation">}</span>
+<span class="token operator">...</span>
+<span class="token punctuation">}</span></code></pre>
+<p>In order to be a reactive agent, it needs to both perceive parts of the environment (take in input) and also have a reaction process according to its input (produce output). This will be done through methods of the class. For eg:</p>
+<pre><code>  seek( target ) {
+    Do some calculations
+    return output
+  }
+
+  avoid( [objects] ) {
+  ...
+  }
+</code></pre>
+<p>Where ‘target’ and ‘[objects]’ are inputs that the agent takes from the environment1. And the output is the calculated reaction - which in our case is a steering force.</p>
+<p>Now since, all our simulations of autonomous agents, will not handle gravity, friction and other external forces. The only part that concerns the use of physical laws is the calculation of new positions. Therefore, to simplify our code, let’s assume that <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.186ex;" xmlns="http://www.w3.org/2000/svg" width="6.135ex" height="1.692ex" role="img" focusable="false" viewBox="0 -666 2711.6 748" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><use data-c="1D45A" xlink:href="#MJX-TEX-I-1D45A"></use></g><g data-mml-node="mo" transform="translate(1155.8,0)"><use data-c="3D" xlink:href="#MJX-TEX-N-3D"></use></g><g data-mml-node="mn" transform="translate(2211.6,0)"><use data-c="31" xlink:href="#MJX-TEX-N-31"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>m</mi><mo>=</mo><mn>1</mn></math></mjx-assistive-mml></mjx-container>, then</p>
+<p><mjx-container class="MathJax" jax="SVG" display="true" style="position: relative;"><svg style="vertical-align: -0.186ex;" xmlns="http://www.w3.org/2000/svg" width="7.732ex" height="1.731ex" role="img" focusable="false" viewBox="0 -683 3417.6 765" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><use data-c="1D6F4" xlink:href="#MJX-TEX-I-1D6F4"></use></g><g data-mml-node="mi" transform="translate(806,0)"><use data-c="1D439" xlink:href="#MJX-TEX-I-1D439"></use></g><g data-mml-node="mo" transform="translate(1832.8,0)"><use data-c="3D" xlink:href="#MJX-TEX-N-3D"></use></g><g data-mml-node="mi" transform="translate(2888.6,0)"><use data-c="1D44E" xlink:href="#MJX-TEX-I-1D44E"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="block"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>Σ</mi><mi>F</mi><mo>=</mo><mi>a</mi></math></mjx-assistive-mml></mjx-container></p>
+<p>Which changes the calculation of acceleration in <code>applyForce()</code> to just adding the force to acceleration.</p>
+<pre tabindex="0" class="code-block"><code class="language-js">  <span class="token function">applyForce</span><span class="token punctuation">(</span><span class="token parameter">force</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>acc<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>force<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span></code></pre>
+<p>This also implies, in order to calculate an acceleration to change our velocity from current to desired, is same as calculating the steering force, therefore:</p>
+<pre><code>steering force = desired velocity - current velocity 
+</code></pre>
+<p>The above equation is the common for all agents regardless of how the desired velocity is calculated (i.e., what behaviour we are dealing with), so we shall implement a method <code>steer()</code> in AutonMover that calculates and applies the steering force:</p>
+<pre tabindex="0" class="code-block"><code class="language-js">  <span class="token function">steer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">let</span> steer <span class="token operator">=</span> p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">sub</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    steer<span class="token punctuation">.</span><span class="token function">limit</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>maxForce<span class="token punctuation">)</span><span class="token punctuation">;</span>         
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">applyForce</span><span class="token punctuation">(</span>steer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+</code></pre>
+<h3>4.3.2 Implementation of the 3 stages of motion behaviour:</h3>
+<p><strong>Action Selection</strong>: Is implemented through classes. Since action selection is the base guide for differentiating between motion behaviours, for each kind of behaviour, we will take all the common features of AA from the AutonMover class and extend on it including method(s) unique to the class for implementing the specific behaviour2.</p>
+<p>The above notion of extension is implemented in <strong>JS</strong> as <em>Class Inheritance</em>, the syntax:</p>
+<pre><code>Behaviour1_Agent extends AutonMover{
+  ...
+  behaviour(parm1, param2, ...){
+  }
+  ...
+}
+</code></pre>
+<p>Now when calling upon the properties of <code>Behaviour1_Agent</code>, one can also call the properties of the parent class <code>AutonMover</code>, with the same syntax.</p>
+<p>i.e., when we call <code>Behaviour1_Agent.pos</code>, the compiler will first look for <code>pos</code> defined in the current class and if not found, it will look for it in the parent class, and return that value.</p>
+<p><strong>Steering behaviour</strong>: Is implemented as the <code>steer()</code> function mentioned above. Also since desired velocity is a part of our agents that is constantly used and calculated, we will make it a property - <code>desired_vel</code> initialized during construction in <code>AutonMover</code>.</p>
+<p><strong>Locomotion</strong>: Includes all things implemented for embodiment characteristic for visualisation of our agent in our environment. One further visual element that would be useful is incorporation of current velocity in the circle, i.e., emphasis on the current direction. This can be implemented in several ways with the help of <code>push()</code> and <code>pop()</code> functions<sup>3</sup>. For this we shall implement a dynamic mouth animation - which shall open and close in a rhythmic oscillatory fashion.</p>
+<pre tabindex="0" class="code-block"><code class="language-js"><span class="token function">display</span><span class="token punctuation">(</span><span class="token parameter">dinstingDirection <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">,</span> mouthSize <span class="token operator">=</span> <span class="token constant">PI</span> <span class="token operator">/</span> <span class="token number">10</span></span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>dinstingDirection<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">push</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">fill</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">translate</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>x<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>y<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">rotate</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">.</span><span class="token function">heading</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">let</span> lowerLip <span class="token operator">=</span> mouthSize <span class="token operator">/</span> <span class="token number">2</span> <span class="token operator">*</span> <span class="token function">sin</span><span class="token punctuation">(</span>frameCount <span class="token operator">*</span> <span class="token number">0.1</span><span class="token punctuation">)</span> <span class="token operator">+</span> mouthSize <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">;</span>
+    <span class="token function">arc</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token constant">D</span><span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token constant">D</span><span class="token punctuation">,</span> lowerLip<span class="token punctuation">,</span> <span class="token constant">TWO_PI</span> <span class="token operator">-</span> lowerLip<span class="token punctuation">,</span> <span class="token constant">PIE</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token comment">//Draw a circle at the current location (x,y) with radius r = D/2</span>
+<span class="token punctuation">}</span></code></pre>
+<p>The implementation idea is obvious after one observes that <code>arc()</code> parameters are, <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.025ex;" xmlns="http://www.w3.org/2000/svg" width="1.294ex" height="1.025ex" role="img" focusable="false" viewBox="0 -442 572 453" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><use data-c="1D465" xlink:href="#MJX-TEX-I-1D465"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi></math></mjx-assistive-mml></mjx-container> position, <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.464ex;" xmlns="http://www.w3.org/2000/svg" width="1.109ex" height="1.464ex" role="img" focusable="false" viewBox="0 -442 490 647" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><use data-c="1D466" xlink:href="#MJX-TEX-I-1D466"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>y</mi></math></mjx-assistive-mml></mjx-container> position, width, height, start, stop respectively. Where the arc is drawn at <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="5.169ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 2284.7 1000" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><use data-c="28" xlink:href="#MJX-TEX-N-28"></use></g><g data-mml-node="mi" transform="translate(389,0)"><use data-c="1D465" xlink:href="#MJX-TEX-I-1D465"></use></g><g data-mml-node="mo" transform="translate(961,0)"><use data-c="2C" xlink:href="#MJX-TEX-N-2C"></use></g><g data-mml-node="mi" transform="translate(1405.7,0)"><use data-c="1D466" xlink:href="#MJX-TEX-I-1D466"></use></g><g data-mml-node="mo" transform="translate(1895.7,0)"><use data-c="29" xlink:href="#MJX-TEX-N-29"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></math></mjx-assistive-mml></mjx-container> with size <strong>(width x height)</strong> and the arc starts from start and ends at stop clockwise (where both are in radians). In order to animate the mouth, we just use <code>sin()</code> function’s output with the input as <code>frameCount</code> and scale it to <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="2.389ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 1056 1000" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><use data-c="5B" xlink:href="#MJX-TEX-N-5B"></use></g><g data-mml-node="mn" transform="translate(278,0)"><use data-c="30" xlink:href="#MJX-TEX-N-30"></use></g><g data-mml-node="mo" transform="translate(778,0)"><use data-c="2C" xlink:href="#MJX-TEX-N-2C"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo stretchy="false">[</mo><mn>0</mn><mo>,</mo></math></mjx-assistive-mml></mjx-container> mouth_size] from <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="6.287ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 2778.7 1000" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><use data-c="5B" xlink:href="#MJX-TEX-N-5B"></use></g><g data-mml-node="mo" transform="translate(278,0)"><use data-c="2212" xlink:href="#MJX-TEX-N-2212"></use></g><g data-mml-node="mn" transform="translate(1056,0)"><use data-c="31" xlink:href="#MJX-TEX-N-31"></use></g><g data-mml-node="mo" transform="translate(1556,0)"><use data-c="2C" xlink:href="#MJX-TEX-N-2C"></use></g><g data-mml-node="mn" transform="translate(2000.7,0)"><use data-c="31" xlink:href="#MJX-TEX-N-31"></use></g><g data-mml-node="mo" transform="translate(2500.7,0)"><use data-c="5D" xlink:href="#MJX-TEX-N-5D"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo stretchy="false">[</mo><mo>−</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false">]</mo></math></mjx-assistive-mml></mjx-container>.<sup>4</sup></p>
+<p>Other considerations of locomotion are also the physical limitations that we would like the agent to exhibit, similar to how it would in real life. Since steering force is an internal property and not external, it would have a maximum possible value which depends on the mechanisms according to which we assume our agents to work with. For example if the mode of locomotion is a car - then the value would be limited according to the maximum energy produced by the engine and the sturdiness and turning gear of the tires. Else if it is an animal - then the value would be dependent on muscular strength and power.</p>
+<p>In order to impose those qualities within our abstract implementation, we introduce the maxForce property - which limits the maximum magnitude, as seen in l2 of steer(). Similarly to avoid our velocity magnitude from taking extreme values and to set a base value for the desired velocity’s magnitude, we introduce the maxSpeed property. This concludes, all required properties of our AutonMover class,</p>
+<pre tabindex="0" class="code-block"><code class="language-js"><span class="token keyword">class</span> <span class="token class-name">AutonMover</span> <span class="token punctuation">{</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">x<span class="token punctuation">,</span> y<span class="token punctuation">,</span> r</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>r <span class="token operator">=</span> r<span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token constant">D</span> <span class="token operator">=</span> r <span class="token operator">*</span> <span class="token number">2</span><span class="token punctuation">;</span>                  <span class="token comment">//Diameter of the particle - used in defining shapes </span>
+    
+    <span class="token keyword">this</span><span class="token punctuation">.</span>pos <span class="token operator">=</span> <span class="token function">createVector</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>vel <span class="token operator">=</span> p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">random2D</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>acc <span class="token operator">=</span> <span class="token function">createVector</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel <span class="token operator">=</span> <span class="token function">createVector</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span>maxSpeed <span class="token operator">=</span> <span class="token number">5</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>maxForce <span class="token operator">=</span> <span class="token number">0.125</span><span class="token punctuation">;</span>
+
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span>posHistory <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>showHistory <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment">/* All the other methods like seek() and applyForce() etc., follows */</span></code></pre>
+<p>Note, the use of <code>posHistory</code> and <code>showHistory</code> will be explained in <a href="#434-comparing-implementations-of-random-motion-behaviours">4.3.4</a></p>
+<h3>4.3.3 Implementing specific autonomous behaviours</h3>
+<h4>Seeking behaviour:</h4>
+<p>As mentioned, all agents’ implementation is an extension of the AutonMover class, the extension being only the implementation of a particular behaviour.<sup>5</sup> Therefore we shall only going forward mention those extended methods, and assume all other things the same, unless mentioned otherwise.</p>
+<p>For a seeker:</p>
+<p>Goal / Selected action: To chase a target object (stationary or moving)</p>
+<p>Steering behaviour / Desired velocity calculation : towards the object at maxSpeed</p>
+<p>Implementation:</p>
+<pre tabindex="0" class="code-block"><code class="language-js"><span class="token function">seek</span><span class="token punctuation">(</span><span class="token parameter">target</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel <span class="token operator">=</span> p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">sub</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">let</span> distance <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel<span class="token punctuation">.</span><span class="token function">mag</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">steer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Right now, although the seeker is aware of the position of its target, it doesn’t have a perception of <strong>depth/distance</strong>, and therefore it overshoots the target once it reaches. We can include this in our implementation by adding a distance check using <strong>distance</strong>.<code>mag()</code> and scale our desired velocity to slow down once close by target.<sup>6</sup> We implement this by adding an extra boolean parameter to our seek function - <code>arriving_bhv</code> - if true, then we run extra extra code in <code>seek()</code> - within the if block.</p>
+<pre tabindex="0" class="code-block"><code class="language-js"><span class="token function">seek</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> arrive <span class="token operator">=</span> <span class="token boolean">false</span></span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel <span class="token operator">=</span> p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">sub</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">let</span> distance <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel<span class="token punctuation">.</span><span class="token function">mag</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  
+  <span class="token comment">// Added code</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>arrive <span class="token operator">&amp;&amp;</span> distance <span class="token operator">&lt;</span> <span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">let</span> desiredMag <span class="token operator">=</span> <span class="token function">map</span><span class="token punctuation">(</span>distance<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>maxSpeed<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel<span class="token punctuation">.</span><span class="token function">setMag</span><span class="token punctuation">(</span>desiredMag<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">else</span><span class="token punctuation">{</span><span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel<span class="token punctuation">.</span><span class="token function">setMag</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>maxSpeed<span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token comment">//End of added code</span>
+
+  <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">steer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Now you have a simulation of an seeker that can choose to have depth-perception:</p>
+<div class="simulation-container">
+  <div id="sec1" class="interactive-sketch"></div>
+  <div id="interactive-controls-sec1" class="interactive-panel"></div>
+  <div class="control-buttons">
+    <button onclick="pauseButtonToggle(this, sec1Sketch);">Play</button> 
+    <button onclick="sec1Sketch.initializeSketch();">Reset</button>
+  </div>
+</div>
+<p>The above example also subtly hints on the relationship between the input to the agent and the output. i.e., the amount of sophistication the agents’ steering behaviour has is proportional to the amount of information the seeker can perceive and process from the canvas.</p>
+
+
+  <h4>Evading behaviour:</h4>
+<p>Selected action: Running away from pursuer/target</p>
+<p>Steering behaviour: Desired velocity is pointing away from the target at maxSpeed - negative of  desired in seeker.</p>
+<p>Implementation:</p>
+<pre tabindex="0" class="code-block"><code class="language-js">  <span class="token function">evade</span><span class="token punctuation">(</span><span class="token parameter">target</span><span class="token punctuation">)</span><span class="token punctuation">{</span> 
+    <span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel <span class="token operator">=</span> p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">sub</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">let</span> distance <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel<span class="token punctuation">.</span><span class="token function">mag</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel<span class="token punctuation">.</span><span class="token function">setMag</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>maxSpeed<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">steer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span></code></pre>
+<p><strong>NOTE</strong>: The above snippet looks different, because it is from newer implementations of all agents, where steer <strong>doesn't apply the force</strong>, but just <strong>returns whatever force</strong> should be applied. This will be further explained in chapter 5.</p>
+<p>Similar to the seeker, we implement a sense of ‘depth perception’ to the evader, by calculating the distance from the target, and slowing down if far enough - perceived safe - from the target, and speed up, faster than usual if close enough - perceived unsafe - from the target. Including this in our implementation, we have:</p>
+<pre tabindex="0" class="code-block"><code class="language-js">  <span class="token function">evade</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> safeAware <span class="token operator">=</span> <span class="token boolean">false</span></span><span class="token punctuation">)</span><span class="token punctuation">{</span> 
+    <span class="token operator">...</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>safeAware<span class="token punctuation">)</span><span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>distance <span class="token operator">&lt;</span> <span class="token number">150</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">let</span> desiredMag <span class="token operator">=</span> <span class="token function">map</span><span class="token punctuation">(</span>distance<span class="token punctuation">,</span> <span class="token number">150</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>maxSpeed<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>maxSpeed<span class="token operator">*</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel<span class="token punctuation">.</span><span class="token function">setMag</span><span class="token punctuation">(</span>desiredMag<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">steer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>distance <span class="token operator">&gt;</span> <span class="token number">500</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">let</span> desiredMag <span class="token operator">=</span> <span class="token function">map</span><span class="token punctuation">(</span>distance<span class="token punctuation">,</span> <span class="token number">600</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>maxSpeed <span class="token operator">*</span> <span class="token number">0.2</span><span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>maxSpeed<span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>desired_vel<span class="token punctuation">.</span><span class="token function">setMag</span><span class="token punctuation">(</span>desiredMag<span class="token punctuation">)</span><span class="token punctuation">;</span>   
+        
+        <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">steer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token operator">...</span>
+  <span class="token punctuation">}</span></code></pre>
+<p>Therefore we have our simulation</p>
+<div class="simulation-container">
+  <div id="sec2" class="interactive-sketch"></div>
+  <div id="interactive-controls-sec2" class="interactive-panel"></div>
+  <div class="control-buttons">
+    <button onclick="pauseButtonToggle(this, sec2Sketch);">Play</button> 
+    <button onclick="sec2Sketch.initializeSketch();">Reset</button>
+  </div>
+</div>
+
+  <h4>Wandering behaviour:</h4>
+<p>Selected action:<br>
+Sustained-direction random walk<sup>6</sup> - no erratic changes in direction of motion<br>
+Steering behaviour:<br>
+Dependent steering force - small (random) change to the steering force from previous frame</p>
+<p>Implementation:<br>
+Seeking a randomly changing point on a circle - whose center lie ahead of the agent</p>
+<p>Since, we are extending upon the seeking behaviour implemented above, we shall extend our <code>Wanderer</code> Class from <code>Seeker</code>. Now, when the <code>Wanderer</code> is initialised we need a few more properties to be defined. Therefore in Wanderer’s constructor, we want all of Seeker’s properties and add on new ones. Just like <code>this</code> refers to the current class, <code>super</code> directly refers to the parent class, therefore:</p>
+<pre tabindex="0" class="code-block"><code class="language-js"><span class="token keyword">class</span> <span class="token class-name">Wanderer</span> <span class="token keyword">extends</span> <span class="token class-name">Seeker</span><span class="token punctuation">{</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">x<span class="token punctuation">,</span>y<span class="token punctuation">,</span>r</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">super</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span>y<span class="token punctuation">,</span>r<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span>wanderRadius <span class="token operator">=</span> <span class="token number">40</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>predictionInterval <span class="token operator">=</span> <span class="token number">100</span><span class="token punctuation">;</span>    <span class="token comment">// How far ahead to draw the circle</span>
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span>predictedPos <span class="token operator">=</span> <span class="token function">createVector</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment">// Vector from current position to predicted position</span>
+
+    <span class="token comment">// Since we are making random changes to the target position along a circle, </span>
+    <span class="token comment">// we use the angle (b/w the target from the center and current direction) - and make small changes to it</span>
+    <span class="token comment">// i.e., we work with polar coordinates</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>targetAngle<span class="token operator">=</span><span class="token function">radians</span><span class="token punctuation">(</span><span class="token function">random</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">360</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment">// Initialize to some random angle - same as random(0, TWO_PI)</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>displayWanderCircle <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span> 
+  <span class="token operator">...</span>
+<span class="token punctuation">}</span></code></pre>
+<p>where the unexplained properties have the obvious interpretation from their names. The calculation of target is implemented as <code>calculateWandererTarget()</code><sup>7</sup></p>
+<pre tabindex="0" class="code-block"><code class="language-js"><span class="token function">calculateWanderTarget</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>              
+  <span class="token keyword">this</span><span class="token punctuation">.</span>predictedPos<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">setMag</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>predictionInterval<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>predictedPos<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+
+  <span class="token keyword">this</span><span class="token punctuation">.</span>targetAngle <span class="token operator">+=</span> <span class="token function">random</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">0.3</span><span class="token punctuation">,</span><span class="token number">0.3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>#target<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>p5<span class="token punctuation">.</span>Vector<span class="token punctuation">.</span><span class="token function">fromAngle</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>targetAngle <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">.</span><span class="token function">heading</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token keyword">this</span><span class="token punctuation">.</span>wanderRadius<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// target = (θ, r) is in polar coords</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>#target<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>predictedPos<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Now, because the <code>update()</code> in Seeker can already seek, all we have to do is input the internal target of the wanderer as the argument for target when calling like usual in <code>draw()</code>.<sup>8</sup></p>
+<p>( - without the randomRadius lines)</p>
+<p>Finally, for understanding the implementation, by explicitly drawing the mechanics of the wanderer ( if <code>displayCircle = true</code> ) we call the method <code>displayCircle()</code>,</p>
+<pre tabindex="0" class="code-block"><code class="language-js">  <span class="token function">displayCircle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token comment">//the circle is not filled with colour to avoid confusion with the actual mover</span>
+    <span class="token function">noFill</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
+    <span class="token function">line</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>x<span class="token punctuation">,</span><span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span>y<span class="token punctuation">,</span><span class="token keyword">this</span><span class="token punctuation">.</span>predictedPos<span class="token punctuation">.</span>x<span class="token punctuation">,</span><span class="token keyword">this</span><span class="token punctuation">.</span>predictedPos<span class="token punctuation">.</span>y<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">circle</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>predictedPos<span class="token punctuation">.</span>x<span class="token punctuation">,</span><span class="token keyword">this</span><span class="token punctuation">.</span>predictedPos<span class="token punctuation">.</span>y<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>wanderRadius<span class="token operator">*</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">line</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>predictedPos<span class="token punctuation">.</span>x<span class="token punctuation">,</span><span class="token keyword">this</span><span class="token punctuation">.</span>predictedPos<span class="token punctuation">.</span>y<span class="token punctuation">,</span><span class="token keyword">this</span><span class="token punctuation">.</span>#target<span class="token punctuation">.</span>x<span class="token punctuation">,</span><span class="token keyword">this</span><span class="token punctuation">.</span>#target<span class="token punctuation">.</span>y<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">circle</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>#target<span class="token punctuation">.</span>x<span class="token punctuation">,</span><span class="token keyword">this</span><span class="token punctuation">.</span>#target<span class="token punctuation">.</span>y<span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span></code></pre>
+<p>Therefore, updating our <code>display()</code> function to be:</p>
+<pre tabindex="0" class="code-block"><code class="language-js"><span class="token function">display</span><span class="token punctuation">(</span><span class="token parameter">dinstingDirection <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">,</span> mouthSize <span class="token operator">=</span> <span class="token constant">PI</span> <span class="token operator">/</span> <span class="token number">10</span></span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>displayWanderCircle<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">displayCircle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">display</span><span class="token punctuation">(</span>dinstingDirection<span class="token punctuation">,</span> mouthSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p><strong>Implementing random Radius</strong>:</p>
+<ul>
+<li>
+<p>The wanderer’s motion for given parameters, though has sustained turning the circular movement seems to occur too often, hence its pattern of movement feels predictable relative to usual ‘random walks’ and the radius of this circular movement differs only by a small amount</p>
+</li>
+<li>
+<p>A partial attempt at resolving this is picking a random radius of the target circle at every frame (i.e., introduce a conditional into <code>draw()</code>), but still constraining to a minimum and maximum value - maximum being the obvious choice since the circle shouldn't intersect with <code>Wanderer</code> (then what would it mean to target something inside you!) and lower bound being visible enough</p>
+</li>
+</ul>
+<pre><code>wanderer.wanderRadius = randomRadius ? constrain(wanderer.wanderRadius+=random(-2,2), 5, wanderer.predictionInterval-wanderer.r) 
+                        : wanderer.wanderRadius;
+</code></pre>
+<div class="simulation-container">
+  <div id="sec3" class="interactive-sketch"></div>
+  <div id="interactive-controls-sec3" class="interactive-panel"></div>
+  <div class="control-buttons">
+    <button onclick="pauseButtonToggle(this, sec3Sketch);">Play</button> 
+    <button onclick="sec3Sketch.initializeSketch();">Reset</button>
+  </div>
+</div>
+
+  <h3>4.3.4 Comparing implementations of random motion behaviours</h3>
+<p>The main reason we have implemented Wandering behaviour, instead of the other autonomous behaviours mentioned in [Reynolds 99] is the theme of randomness that we have explored until now. Then the question arises, that when all things considered most of the movers until this chapter possesses random movement, what makes Wanderer special?</p>
+<p>Therefore as an attempt to answer this question, we will compare Normal walkers, Perlin walkers and Wanderers (in order of their visually ‘smooth’ movement). But in order to compare them, we need them to have comparable parameters and similar implementations. But as we’ve seen, the implementations of our random walkers vary according to their own context.</p>
+<p>Therefore first, we generalise the structure of our walkers and rewrite the code containing these walkers according to the general mover model from 1.3.3 where, the update function is a modified version of the pseudo-code in 2.3.1 where</p>
+<pre><code>update(p1, p2, … , pn){
+  updateVelocity(applied quantity, p1, p2, … , pn)
+  new pos = 𝑓( velocity [, old pos] )  // i.e., new pos = old pos + velocity
+
+  checkEdges()
+}
+</code></pre>
+<p>Where, we calculate velocity in <code>updateVelocity()</code> every frame, from the applied quantity which itself is either internally (which may take environmental factors into considerations). Then 𝑓 calculates the new position using Euler integration, i.e., and if we are outside our canvas, <code>checkEdges</code>, will position us back into the canvas (at the opposite end of where we went out from). Therefore by ensuring all three types of movers follow this structure, allows us to do two things:</p>
+<ol>
+<li>Reduce the problem from looking at each simulation separately, to just looking at the affecting parameters (p1, p2, etc,) and knowing that all other things are the same. We’ll have that the  the size of the movers, the sketch to be the same and</li>
+</ol>
+<ul>
+<li><mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.186ex;" xmlns="http://www.w3.org/2000/svg" width="6.3ex" height="1.692ex" role="img" focusable="false" viewBox="0 -666 2784.6 748" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><use data-c="1D45F" xlink:href="#MJX-TEX-I-1D45F"></use></g><g data-mml-node="mo" transform="translate(728.8,0)"><use data-c="3D" xlink:href="#MJX-TEX-N-3D"></use></g><g data-mml-node="mn" transform="translate(1784.6,0)"><use data-c="31" xlink:href="#MJX-TEX-N-31"></use><use data-c="30" xlink:href="#MJX-TEX-N-30" transform="translate(500,0)"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>r</mi><mo>=</mo><mn>10</mn></math></mjx-assistive-mml></mjx-container></li>
+<li>pos = (<code>width</code><mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="2.262ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 1000 1000" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mo"><use data-c="2F" xlink:href="#MJX-TEX-N-2F"></use></g></g><g data-mml-node="mn" transform="translate(500,0)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow data-mjx-texclass="ORD"><mo>/</mo></mrow><mn>2</mn></math></mjx-assistive-mml></mjx-container>, <code>height</code><mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="2.262ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 1000 1000" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mo"><use data-c="2F" xlink:href="#MJX-TEX-N-2F"></use></g></g><g data-mml-node="mn" transform="translate(500,0)"><use data-c="32" xlink:href="#MJX-TEX-N-32"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow data-mjx-texclass="ORD"><mo>/</mo></mrow><mn>2</mn></math></mjx-assistive-mml></mjx-container>)     (initial value: center of the screen)</li>
+<li>vel = <code>p5.Vector.random2D()</code>      (initial value)</li>
+<li>maxSpeed = <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.05ex;" xmlns="http://www.w3.org/2000/svg" width="1.131ex" height="1.554ex" role="img" focusable="false" viewBox="0 -665 500 687" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mn"><use data-c="33" xlink:href="#MJX-TEX-N-33"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn></math></mjx-assistive-mml></mjx-container></li>
+</ul>
+<ol start="2">
+<li>Guides us towards creating a more abstracted mover class, from which all the different types can be made using Inheritance as seen earlier in this chapter. (Note, that though this has not been made in this project)</li>
+</ol>
+<p>Now, though we can make direct visual inferences about the change in a mover’s behaviour (i.e., path) when a parameter is changed, it would be better to have an exact visual representation of the path so that we remove the bias that might occur in observations, and also us also observe minor differences. But, we cannot go back to not calling <code>background()</code> every frame, because it causes clutter in our simulation, especially when it runs for long periods of time. Therefore we create a new property <code>posHistory</code> array in our <code>AutonMover</code> class , in which we store <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.025ex;" xmlns="http://www.w3.org/2000/svg" width="1.294ex" height="1.025ex" role="img" focusable="false" viewBox="0 -442 572 453" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><use data-c="1D465" xlink:href="#MJX-TEX-I-1D465"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi></math></mjx-assistive-mml></mjx-container> positions visited up till current frame, and a new function <code>updateHistory()</code>, which adds the current position every frame, and removes if we are above the limit <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.025ex;" xmlns="http://www.w3.org/2000/svg" width="1.294ex" height="1.025ex" role="img" focusable="false" viewBox="0 -442 572 453" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><use data-c="1D465" xlink:href="#MJX-TEX-I-1D465"></use></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi></math></mjx-assistive-mml></mjx-container>. This allows us to observe the local behaviour of our mover, if 𝑥 is made larger we can also observe more global behaviour. Therefore the structure finally will look like this</p>
+<pre><code>class GenericMover(){
+  display(){
+    if (this.showHistory) {
+      for (let i = 0; i &lt; this.posHistory.length-1; i++) {
+        let prevPos = this.posHistory[i];
+        let currPos = this.posHistory[i + 1];
+        
+        // Check if the Mover has jumped edges, and continue the loop and don't draw the line
+        let posChange = p5.Vector.dist(prevPos, currPos);
+        if (posChange &gt;= windowWidth || posChange &gt;= windowHeight) {
+            continue;
+        }
+        line(prevPos.x, prevPos.y, currPos.x, currPos.y);
+      }
+    //Usual things to draw in display
+  }
+
+  updatePosHistory(){
+    // Limiting the maximum number of elements so that the array doesn't grow indefinitely
+    // Array.shift() removes the 1st element, which is the oldest position visited by the walker
+    this.posHistory.push(this.pos.copy());
+    if (this.posHistory.length &gt; maxArrayLength) {      // The max limit can be modified - could be added as a parameter
+        this.posHistory.shift();
+    }
+  }
+
+  update(){
+    ...
+    this.updatePosHistory()
+    ...
+  }
+}
+</code></pre>
+<p>And we also add the boolean property showHistory to toggle drawing the path - which is set true for all our movers in this section. Therefore, now the only difference between each of these movers is the implementation of <code>updateVelocity()</code> and the parameters that affect it.</p>
+<p>(Note though, there are other extra functionality that has been built into each of these movers made for their context, that has been left unchanged from previous implementations - but these do not affect the movement in any way)</p>
+<p>So, below are the visual observations of each of these movers. This is meant to be read with their particular implementations (so please <a href="https://github.com/beeezal/Honours-project-codes/tree/feat/trial-path-movers">check this branch of the GitHub repo</a>), based on set parameters (the observations are made in comparison to each other, where the Wanderer is considered as the baseline, and few observations are also made w.r.t, their own parameters)</p>
+<p><strong>NormalWalker:</strong></p>
+<p>updateVelocity = <code>setAngle()</code><br>
+And update = <code>step()</code> where,</p>
+<p>(The simulation show in chapter 2 is sufficient for the following observations. But an implementation following the above model can be found <a href="https://github.com/beeezal/Honours-project-codes/blob/feat/trial-path-movers/Normal_Random_walker/sketch.js">here</a> )</p>
+<p><strong>Observations</strong></p>
+<ul>
+<li>
+<p>Visually similar to an ant - movement is a bit jagged, almost as if to visit and get a sense of all the neighbouring areas of current position.</p>
+</li>
+<li>
+<p>Jagged motion is due to the fact that though the mean is the current direction, since there is no correlation between the previous angle and current angle, polarising direction could be picked in consecutive frames.</p>
+</li>
+<li>
+<p>There are also immediate revisits in the form of small loops, which can be attributed to the independent ‘randomness’ of the angle value. So suppose a large value towards the left is picked once, and independently again a left-value is picked (and so on - but not necessarily in succession but in close frames) then as there are 60 frames in a second, the loop occurs.</p>
+</li>
+<li>
+<p>Both the jerky and small loops can be largely eliminated if the SD is set to a very small fraction of pi. This also causes loops to almost never occur, which may be undesirable if we want unpredictability and/or some revisiting to occur locally in time.</p>
+</li>
+</ul>
+<p><strong>PerlinWalker</strong></p>
+<p>updateVelocity = <code>static noisyVelocity()</code></p>
+<p>with extended functionality to add noise to even step size, directly into <code>update</code> which is also written as <code>step()</code>.</p>
+<div class="simulation-container">
+  <div id="sec4" class="interactive-sketch"></div>
+  <div id="interactive-controls-sec4" class="interactive-panel"></div>
+  <div class="control-buttons">
+    <button onclick="pauseButtonToggle(this, sec4Sketch);">Play</button> 
+    <button onclick="sec4Sketch.initializeSketch();">Reset</button>
+  </div>
+</div>
+<p><strong>Observations:</strong></p>
+<ul>
+<li>
+<p>Visually similar to the wanderer, but behaves more unpredictably, almost like it is juking and avoiding something</p>
+</li>
+<li>
+<p>That is, a lot less immediate revisits and jerkiness compared to the normal walker. Loops occur, but the interval between and its size vary a lot. The motion is always smooth, even when the looping size is small.</p>
+</li>
+<li>
+<p>All of the above above observations can be attributed to two qualities of the implementation:</p>
+</li>
+<li>
+<p>The highly correlated output given by PNoise algorithm</p>
+</li>
+<li>
+<p>The magnitude scaling to a constant, even though the real output varies anywhere within the unit square.</p>
+</li>
+<li>
+<p>So when PNoise returns smaller values of both x and y coordinate, the change gets magnified by the magnitude scaling and therefore extremely small loops occur. But, when larger values are returned in both coordinates, then the change gets diminished by the scaling.</p>
+</li>
+<li>
+<p>This added to the fact that we make sure the x and y coordinates are independent of each other - by taking a large offset in their input values, causes the highly unpredictable yet smooth motion.</p>
+</li>
+<li>
+<p>If less smoothness is desired, one can simply cause the change in input value to increase more each frame, hence reducing the correlation between each frame’s position</p>
+</li>
+</ul>
+<p><strong>Wanderer</strong></p>
+<p>updateVelocity = <code>calculateWanderTarget()</code> + <code>steer()</code></p>
+<p>Implementation is the same as given in the previous subsection.</p>
+<p>Observations:</p>
+<ul>
+<li>
+<p>Visually similar to a police vehicle patrolling a particular open area. Revisiting occurs in loops that are much closer to circles than ellipses as seen in the other movers, and the loops are never small, therefore each revisit feels more intentional than happenstance, because of its random nature. Loops also occur the most often, with other curved/straight paths being rare.</p>
+</li>
+<li>
+<p>The movement therefore presents itself as extremely smooth and circular - like a double compass where the pivot is changed at random intervals of time</p>
+</li>
+<li>
+<p>First it's important to note that these observations align with the design choices and model intentions6 of a long-term order (in terms of looping behaviour) and sustained turning [Reynolds 99]. Both the intended goal and the observations can be related with:</p>
+</li>
+<li>
+<p>Constraining the seek target onto a circle and changing its position randomly on it. This causes the direction to stay constant much longer, as the position of the target is dependent on its previous position and though there is no correlation in the direction the target moves, since half of the circle causes the mover to move in a single direction, sustained turns are created</p>
+</li>
+<li>
+<p>The limitation of the steering force inherited from the Seeker plays the main role in the lack of smaller loops, as the Wanderer is never moving to its desired destination as ‘fast as possible’, therefore making the sustained turning more pronounced.</p>
+</li>
+<li>
+<p>If one desires to have a Wanderer that is less circular/revisiting, then increasing the amount of change of the target, or the predictionInterval is required (reducing correlation similar to PerlinWalker). In order to reduce the long-term order that we see, we would have to introduce more randomness (one that has less correlation) and I found that randomizing the radius works the best, as seen in the previous subsection.</p>
+</li>
+</ul>
+<p><strong>Concluding thoughts of this section</strong>:</p>
+<p>From the above observations, it is clear that if one had access only to the simulation output and not the implementation or design of model, it would be hard to call only one of them autonomous, while the others are not. It would seem to the viewer as if all are autonomous or all of them are not, based on their perspective.</p>
+<p>For one might think that it is absurd to call ‘roam around’ or ‘walk randomly’ a goal at all in the first place. One could argue that it is indeed a goal when you introduce ‘sustained turning’ for the Wanderer. But one could also equally argue that the introduction of ‘be unpredictable’ or ‘change direction to avoid being caught by a predator’ makes it a goal for PerlinWalker. Such ambiguity could be resolved (or attempted to) by then looking at the model itself and intentions behind each choice.</p>
+<p>Then, one could say that there was no intention in the implementation of PerlinWalker beyond providing a smooth random walker, while the clear intentions of design for the Wanderer (which is definitely achieved) has directly affected the implementation - where we use desired velocity and steering forces in order to drive the motion of the mover.</p>
+<p>But, one could draw equivalences between the algorithm for PerlinWalker and that of Wanderer, or even make them similar without introducing new design intentions, and there is still the problem of the uninformed viewer. Therefore, there must be more work done in regards to the definition of an autonomous agent, to clearly distinguish between each case mentioned here.</p>
+<p>Therefore I end this section by claiming that classification of wanderer is an edge case, and including that may have us include perlin noise as <em>autonomous</em> well - is an important observation. yes as expected one should be able to go back from visuals to intended outcomes and check what is going on. All arbitrary variable choices in this proejct are in essence an outcome of this effect</p>
+<h2>Notes:</h2>
+<ol>
+<li>
+<p>This also implicitly implies that we only give limited information about the environment to the agent. This is an intentional design choice because, providing too much information is redundant, and is also unrealistic in nature - no being would have unlimited perception of its surroundings - then its choices would be according to a global optimum, rather than a localised behaviour.</p>
+</li>
+<li>
+<p>This does impose one limitation of OOP in JS, which is to define an agent with 2 behaviours one cannot simply give it the properties of two classes implementing them separately. \n<br>
+We would simply have to implement a new class that contains both the properties - which is extra code doing the same thing - violating the DRY principle of programming \n<br>
+To combat this we can define the individual behaviours from the class implementing both - though this reduces code length - it is unintuitive in approach.</p>
+</li>
+<li>
+<p>We could technically contain all of autonomous agent implementation just inside AutonMover - use callback functions to implement specific behaviours - i.e., create functions - for particular behaviours - and pass them into AutonMover. But there is a line to be drawn between understandable and compact, which is beyond the scope of this thesis.</p>
+</li>
+<li>
+<p>We could also increase speed as we initially get closer - visually stimulating an agent that gets ‘excited’ as it observes the closeness of its target</p>
+</li>
+<li>
+<p>Wanderer was implemented first - observations made - then compared the design choices of [Reynolds 99] with observations - asserting the action selection / ‘goal’ set there was achieved. This is further explained in</p>
+</li>
+<li>
+<p>We can get the target although it's private, because we defined a getter method for it within the Wanderer class.</p>
+</li>
+<li>
+<p>The implementation of the wanderer ideally should be self contained within the class, but in the given code it is incomplete without the actual sketch. Because  the randomisation of radius of the target circle is implemented globally, although it can very much be implemented within the class</p>
+</li>
+</ol>
+
+
+
+<!-- Auto-load section scripts -->
+
+  <script src="/Honours-website-project/assets/scripts/chap4_01.js"></script>
+
+  <script src="/Honours-website-project/assets/scripts/chap4_02.js"></script>
+
+  <script src="/Honours-website-project/assets/scripts/chap4_03.js"></script>
+
+  <script src="/Honours-website-project/assets/scripts/chap4_04.js"></script>
+
+
+<svg style="display: none;" id="MJX-SVG-global-cache"><defs><path id="MJX-TEX-I-1D45A" d="M21 287Q22 293 24 303T36 341T56 388T88 425T132 442T175 435T205 417T221 395T229 376L231 369Q231 367 232 367L243 378Q303 442 384 442Q401 442 415 440T441 433T460 423T475 411T485 398T493 385T497 373T500 364T502 357L510 367Q573 442 659 442Q713 442 746 415T780 336Q780 285 742 178T704 50Q705 36 709 31T724 26Q752 26 776 56T815 138Q818 149 821 151T837 153Q857 153 857 145Q857 144 853 130Q845 101 831 73T785 17T716 -10Q669 -10 648 17T627 73Q627 92 663 193T700 345Q700 404 656 404H651Q565 404 506 303L499 291L466 157Q433 26 428 16Q415 -11 385 -11Q372 -11 364 -4T353 8T350 18Q350 29 384 161L420 307Q423 322 423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 181Q151 335 151 342Q154 357 154 369Q154 405 129 405Q107 405 92 377T69 316T57 280Q55 278 41 278H27Q21 284 21 287Z"></path><path id="MJX-TEX-N-3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path><path id="MJX-TEX-N-31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path><path id="MJX-TEX-I-1D6F4" d="M65 0Q58 4 58 11Q58 16 114 67Q173 119 222 164L377 304Q378 305 340 386T261 552T218 644Q217 648 219 660Q224 678 228 681Q231 683 515 683H799Q804 678 806 674Q806 667 793 559T778 448Q774 443 759 443Q747 443 743 445T739 456Q739 458 741 477T743 516Q743 552 734 574T710 609T663 627T596 635T502 637Q480 637 469 637H339Q344 627 411 486T478 341V339Q477 337 477 336L457 318Q437 300 398 265T322 196L168 57Q167 56 188 56T258 56H359Q426 56 463 58T537 69T596 97T639 146T680 225Q686 243 689 246T702 250H705Q726 250 726 239Q726 238 683 123T639 5Q637 1 610 1Q577 0 348 0H65Z"></path><path id="MJX-TEX-I-1D439" d="M48 1Q31 1 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H742Q749 676 749 669Q749 664 736 557T722 447Q720 440 702 440H690Q683 445 683 453Q683 454 686 477T689 530Q689 560 682 579T663 610T626 626T575 633T503 634H480Q398 633 393 631Q388 629 386 623Q385 622 352 492L320 363H375Q378 363 398 363T426 364T448 367T472 374T489 386Q502 398 511 419T524 457T529 475Q532 480 548 480H560Q567 475 567 470Q567 467 536 339T502 207Q500 200 482 200H470Q463 206 463 212Q463 215 468 234T473 274Q473 303 453 310T364 317H309L277 190Q245 66 245 60Q245 46 334 46H359Q365 40 365 39T363 19Q359 6 353 0H336Q295 2 185 2Q120 2 86 2T48 1Z"></path><path id="MJX-TEX-I-1D44E" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path><path id="MJX-TEX-I-1D465" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path><path id="MJX-TEX-I-1D466" d="M21 287Q21 301 36 335T84 406T158 442Q199 442 224 419T250 355Q248 336 247 334Q247 331 231 288T198 191T182 105Q182 62 196 45T238 27Q261 27 281 38T312 61T339 94Q339 95 344 114T358 173T377 247Q415 397 419 404Q432 431 462 431Q475 431 483 424T494 412T496 403Q496 390 447 193T391 -23Q363 -106 294 -155T156 -205Q111 -205 77 -183T43 -117Q43 -95 50 -80T69 -58T89 -48T106 -45Q150 -45 150 -87Q150 -107 138 -122T115 -142T102 -147L99 -148Q101 -153 118 -160T152 -167H160Q177 -167 186 -165Q219 -156 247 -127T290 -65T313 -9T321 21L315 17Q309 13 296 6T270 -6Q250 -11 231 -11Q185 -11 150 11T104 82Q103 89 103 113Q103 170 138 262T173 379Q173 380 173 381Q173 390 173 393T169 400T158 404H154Q131 404 112 385T82 344T65 302T57 280Q55 278 41 278H27Q21 284 21 287Z"></path><path id="MJX-TEX-N-28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path><path id="MJX-TEX-N-2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path><path id="MJX-TEX-N-29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path><path id="MJX-TEX-N-5B" d="M118 -250V750H255V710H158V-210H255V-250H118Z"></path><path id="MJX-TEX-N-30" d="M96 585Q152 666 249 666Q297 666 345 640T423 548Q460 465 460 320Q460 165 417 83Q397 41 362 16T301 -15T250 -22Q224 -22 198 -16T137 16T82 83Q39 165 39 320Q39 494 96 585ZM321 597Q291 629 250 629Q208 629 178 597Q153 571 145 525T137 333Q137 175 145 125T181 46Q209 16 250 16Q290 16 318 46Q347 76 354 130T362 333Q362 478 354 524T321 597Z"></path><path id="MJX-TEX-N-2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path><path id="MJX-TEX-N-5D" d="M22 710V750H159V-250H22V-210H119V710H22Z"></path><path id="MJX-TEX-I-1D45F" d="M21 287Q22 290 23 295T28 317T38 348T53 381T73 411T99 433T132 442Q161 442 183 430T214 408T225 388Q227 382 228 382T236 389Q284 441 347 441H350Q398 441 422 400Q430 381 430 363Q430 333 417 315T391 292T366 288Q346 288 334 299T322 328Q322 376 378 392Q356 405 342 405Q286 405 239 331Q229 315 224 298T190 165Q156 25 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 114 189T154 366Q154 405 128 405Q107 405 92 377T68 316T57 280Q55 278 41 278H27Q21 284 21 287Z"></path><path id="MJX-TEX-N-2F" d="M423 750Q432 750 438 744T444 730Q444 725 271 248T92 -240Q85 -250 75 -250Q68 -250 62 -245T56 -231Q56 -221 230 257T407 740Q411 750 423 750Z"></path><path id="MJX-TEX-N-32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path><path id="MJX-TEX-N-33" d="M127 463Q100 463 85 480T69 524Q69 579 117 622T233 665Q268 665 277 664Q351 652 390 611T430 522Q430 470 396 421T302 350L299 348Q299 347 308 345T337 336T375 315Q457 262 457 175Q457 96 395 37T238 -22Q158 -22 100 21T42 130Q42 158 60 175T105 193Q133 193 151 175T169 130Q169 119 166 110T159 94T148 82T136 74T126 70T118 67L114 66Q165 21 238 21Q293 21 321 74Q338 107 338 175V195Q338 290 274 322Q259 328 213 329L171 330L168 332Q166 335 166 348Q166 366 174 366Q202 366 232 371Q266 376 294 413T322 525V533Q322 590 287 612Q265 626 240 626Q208 626 181 615T143 592T132 580H135Q138 579 143 578T153 573T165 566T175 555T183 540T186 520Q186 498 172 481T127 463Z"></path></defs></svg></body>
+</html>

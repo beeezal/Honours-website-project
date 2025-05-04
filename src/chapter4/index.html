@@ -1,0 +1,31 @@
+---
+tags: [main, autonomous]
+title: Individual Autonomous Behaviour
+layout: 'base'
+---
+
+<h1>Chapter 4</h1>
+<h1>Individual Autonomous Behaviour</h1>
+<hr>
+<!-- Shared utility function for pausing and resuming any sketch -->
+<script>  
+  let pauseButtonToggle = function (button, sketch) {
+    if (sketch.isLooping()) {
+      button.innerText = "Play";
+      sketch.noLoop();
+    } else {
+      button.innerText = "Pause";
+      sketch.loop();
+    }
+  }
+</script>
+<script src="{{ '/assets/scripts/mover1.js' | url }}"></script>
+
+{% for section in collections.chap4 %}
+  {{ section.templateContent | safe }}
+{% endfor %}
+
+<!-- Auto-load section scripts -->
+{% for section in collections.chap4 %}
+  <script src="{{ section.data.script | url }}"></script>
+{% endfor %}

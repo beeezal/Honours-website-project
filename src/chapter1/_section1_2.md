@@ -9,7 +9,7 @@ permalink: false
 
 To create a of vector object (which is called **p5.Vector** internally in **p5**) we use:  
 let vec = `createVector(30, 200)`   
-Thus vec represents the position vector pointing from the origin to (30, 200)
+Thus vec represents the position vector pointing from the origin to $(30, 200)$
 
 *Basic Vector operations:*  
 Where v1, v2 are vectors and a is a real number
@@ -23,17 +23,17 @@ Where v1, v2 are vectors and a is a real number
 - Random vector from unit circle - ` p5.Vector.random2D()`
 
 
-Note that in `v1.function()` , `function()` is called as a method of the class. Any name that appears as v1*.name* is a property of the class that v1 represents, the ‘ . ’ allows us to access those properties \- thus we are able to call methods like `add()` since they belong to the p5.Vector class. To view all the methods please check the [p5 reference](https://p5js.org/reference/p5/p5.Vector/).
+Note that in `v1.function()` , `function()` is called as a method of the class. Any name that appears as v1*.name* is a property of the class that v1 represents, the ‘ . ’ allows us to access those properties - thus we are able to call methods like `add()` since they belong to the p5.Vector class. To view all the methods please check the [p5 reference](https://p5js.org/reference/p5/p5.Vector/).
 
 ### 1.3.3 Physical entities and classes:
 
-We will implement physical entities (i.e., laws of physics obeying objects)  with the help of a Mover class \- Classes are how we define a new type of object in **js** and give it structure \- with its own properties and functions. 
+We will implement physical entities (i.e., laws of physics obeying objects)  with the help of a Mover class - Classes are how we define a new type of object in **js** and give it structure - with its own properties and functions. 
 
 Below is an example of how the class is implemented, where we are trying to simulate a ball, bouncing around in an enclosed space. Parameters and characteristics of the simulation are:
 
-1. Canvas size \- $500 \times 400$ \- chose so that the ball may hit the edges more often  
-2. Initial velocity \= $(3, -2)$ px/f \- roughly simulates just tossing a ball towards a wall  
-3. Collision with walls, floor \- inelastic in nature
+1. Canvas size - $500 \times 400$ - chose so that the ball may hit the edges more often  
+2. Initial velocity \= $(3, -2)$ px/f -roughly simulates just tossing a ball towards a wall  
+3. Collision with walls, floor - inelastic in nature
 
 The constants \- friction coefficient, gravitational acceleration, percentage of energy lost in after wall-collision are all chosen after experimentation with the visualisation produced by each of these quantities.   
 The mass of the object is an arbitrary quantity \- only there to determine the size of the object and scaling of gravitational force. Note that we increase the gravitational force for heavier objects, in order to simulate what we see in usual environments \- heavier objects fall faster relative to lighter ones (although this isn’t because of gravitation but rather other external forces like air resistance). 

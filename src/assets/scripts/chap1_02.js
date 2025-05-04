@@ -88,7 +88,7 @@ let bouncingBallScript = function (p) {
 	}
 	
 	p.draw = function() {
-		p.background(220);
+		p.background(255);
 		mv.show();
 		mv.applyForce(p5.Vector.mult(gravity, mv.mass));
 

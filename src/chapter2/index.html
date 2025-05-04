@@ -1,41 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Random Walker</title>
+---
+tags: [main, random-walker]
+title: Random Walker
+layout: 'base'
+---
 
-  <link rel="stylesheet" type="text/css" href="{{ '/assets/cssStyle/generic.css' | url }}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
-</head>
-<body style="margin:10px">
-  <h1>Chapter 2</h1>
-  <h1>Random Walker</h1>
-  <hr>
-
-  <!-- Shared utility function for pausing and resuming any sketch -->
-  <script>  
-    let pauseButtonToggle = function (button, sketch) {
-      if (sketch.isLooping()) {
-        button.innerText = "Play";
-        sketch.noLoop();
-      } else {
-        button.innerText = "Pause";
-        sketch.loop();
-      }
+<h1>Chapter 2</h1>
+<h1>Random Walker</h1>
+<hr>
+<!-- Shared utility function for pausing and resuming any sketch -->
+<script>  
+  let pauseButtonToggle = function (button, sketch) {
+    if (sketch.isLooping()) {
+      button.innerText = "Play";
+      sketch.noLoop();
+    } else {
+      button.innerText = "Pause";
+      sketch.loop();
     }
-  </script>
-  
-  {% for section in collections.chap2 %}
-    {{ section.templateContent | safe }}
-  {% endfor %}
+  }
+</script>
 
-  <!-- Auto-load section scripts -->
-  {% for section in collections.chap2 %}
-    <script src="{{ section.data.script | url }}"></script>
-  {% endfor %}
-</body>
-</html>
+{% for section in collections.chap2 %}
+  {{ section.templateContent | safe }}
+{% endfor %}
+
+<!-- Auto-load section scripts -->
+{% for section in collections.chap2 %}
+  <script src="{{ section.data.script | url }}"></script>
+{% endfor %}

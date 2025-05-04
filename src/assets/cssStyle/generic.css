@@ -4,9 +4,10 @@ html{
 }
 
 body {
-  margin: 0;
+  margin: 0 auto;
   padding: 0 3rem;
-  max-width: 1400px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 h1 {

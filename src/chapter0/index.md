@@ -1,3 +1,9 @@
+---
+tags: [main, intro]
+title: Introduction
+layout: 'base'
+---
+
 # Chapter 0
 
 # Getting Started

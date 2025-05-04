@@ -7,7 +7,7 @@ export default function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy('src/assets');
 
   // Layouts alias
-  eleventyConfig.addLayoutAlias('base', 'base.html');
+  eleventyConfig.addLayoutAlias('base', 'layouts/base.html');
 
   // Add Markdown-it plugins
   eleventyConfig.amendLibrary("md", (mdLib) => mdLib.use(markdownItSup));

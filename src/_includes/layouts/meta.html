@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ title }}</title>
+  <link rel="stylesheet" href="{{ '/assets/cssStyle/style.css' | url }}">
+  <link href="https://fonts.googleapis.com/css?family=Inter:400,700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <main>
+    <section class="meta-centered">
+      <h1>{{ title }}</h1>
+      {{ content | safe }}
+    </section>
+  </main>
+</body>
+</html>

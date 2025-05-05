@@ -2,6 +2,8 @@
 tags: [main, intro]
 title: Introduction
 layout: 'base'
+number: 0
+order: 1
 ---
 
 # Chapter 0

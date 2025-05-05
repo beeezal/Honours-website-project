@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+<meta charset="UTF-8">
+    <title>"Motion Behaviour Simulations"</title>
+    <link rel="stylesheet" href="{{ '/assets/cssStyle/style.css' | url }}">
+    <link href="https://fonts.googleapis.com/css?family=Inter:400,700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <main>
+      <section class="intro">
+        <h1>{{ title }}</h1>
+        {{ content | safe }}
+      </section>
+
+      <section class="meta-links">
+        <a href="{{ '/dedication/' | url }}">Dedication</a>
+        <a href="{{ '/abstract/' | url }}">Abstract</a>
+        <a href="{{ '/acknowledgements/' | url }}">Acknowledgements</a>
+      </section>
+
+      <section class="chapters">
+        <div class="chapter-grid">
+          {% set sortedChapters = collections.main | sort(attribute="data.order") %}
+          {% for chapter in sortedChapters %}
+            <a href="{{ chapter.url | url }}" class="chapter-link">
+              {% if chapter.data.number %}
+                <strong>Chapter {{ chapter.data.number }}:</strong>
+                {{ chapter.data.title }}
+              {% else %}
+                <strong>{{ chapter.data.title }}</strong>
+              {% endif %}
+            </a>
+          {% endfor %}
+          <div class = "chapter-grid-center">
+            <a href="{{ '/appendix/' | url }}" class="chapter-link">
+              <strong>Appendix</strong>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+---
+tags: [main, perlin-noise]
+title: Perlin Noise and Smooth Movers
+layout: 'base'
+number: 3
+order: 4
+---
+
+<h1>Chapter 3</h1>
+<h1>Perlin Noise and Smooth Movers</h1>
+<hr>
+
+{% for section in collections.chap3 %}
+  {{ section.templateContent | safe }}
+{% endfor %}
+
+<!-- Auto-load section scripts -->
+<!-- Although there are no scripts in this chapter as of now -->
+<!-- leaving the below code as a placeholder for future use -->
+{% for section in collections.chap3 %}
+  <script src="{{ section.data.script | url }}"></script>
+{% endfor %}

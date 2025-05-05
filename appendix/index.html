@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> Appendix: How to run p5 sketches </title>
+
+  
+  <link rel="stylesheet" type="text/css" href="/Honours-website-project/assets/cssStyle/generic.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer=""></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js" defer=""></script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+</head>
+
+<body>
+ 
+  <h1>Appendix: How to run p5 sketches</h1>
+<p>All methods mentioned, assume the reader knows how to copy and read code from a GitHub repository. Step 1 for all methods is keeping the desired sketch open in GitHub.</p>
+<h3>1. Using the interactive p5 web environment:</h3>
+<ol>
+<li>Open the web editor: <a href="https://editor.p5js.org/">p5.js Web Editor</a></li>
+<li>Copy the code just from the main source-code, i.e., sketch.js</li>
+<li>Paste it into the web editor (and save - Ctrl+S works, to avoid losing it from your editor)</li>
+<li>Click on the Play icon to run the simulation - shown beside the editor (named <em>Preview</em>)</li>
+</ol>
+<p>NOTE: For some sketches (in ch:4,5) I will refer to global files in the repo directory. Check the accompanying index.html (in the same directory as the sketch) to ensure that all the files used are imported to the web editor. And referenced in the index.html file with the correct relative path</p>
+<h3>2. Locally using VSCode IDE (Preferred method by me):</h3>
+<ol>
+<li>Clone the entire repository into your local computer (<a href="https://code.visualstudio.com/docs/sourcecontrol/intro-to-git#_clone-a-repository-locally">How to do that?</a>) - you would also need to have <a href="https://code.visualstudio.com/docs/setup/windows#_install-vs-code-on-windows">VSCode</a> and the <a href="https://git-scm.com/downloads/win">Git</a> installed locally or just the folder containing the sketch you would like to run (in that case you do not need Git)</li>
+<li>Install the <a href="https://marketplace.visualstudio.com/items?itemName=samplavigne.p5-vscode">P5 Server</a> extension in VSCode, this also auto-installs the <em>Live Server</em> extension - which enables the user to host a local server in just one click.</li>
+<li>Right-click onto the corresponding index.html file and click <em>Open with Live Server</em> option - this should automatically open a tab in your browser, which will run the simulation of the code</li>
+<li>Again be careful that all the .js files referenced in sketch.js are available locally on the computer, with the same directory.</li>
+</ol>
+<h3>3. Locally through other means:</h3>
+<ol>
+<li>
+<p>Technically all the written codes should run on any JS runtime environment, which can also locally host a web server. Since all the code only does the following:</p>
+<ol>
+<li>Open a html file (index.html) with all the required libraries, stylesheet and most importantly our sketch.js within a &lt;script&gt; tag to run the code</li>
+<li>While running the code, with the help of the p5 library, it notices that the code is supposed to run on the Canvas element defined using createCanvas( width and height ). And places this element at the origin of the &lt;div&gt; element it is in (usually just the screen)</li>
+</ol>
+</li>
+<li>
+<p>Therefore one could also manipulate the Canvas element to reposition, resize it, by naming it and accessing it within the html, and the p5.js file as <a href="https://mzza.xyz/p5-pause-and-reset/">shown here</a></p>
+</li>
+<li>
+<p>But, the exact methods for running the sketch files will differ according to the JS runtime chosen. So instructions will vary.</p>
+</li>
+</ol>
+
+
+</body>
+</html>

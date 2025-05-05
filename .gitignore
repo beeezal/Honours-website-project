@@ -11,4 +11,3 @@ npm-debug.*
 # Node modules and output
 node_modules
 dist
-src/assets/cssStyle

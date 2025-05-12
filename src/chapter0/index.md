@@ -10,7 +10,7 @@ order: 1
 
 # Getting Started
 
-Understanding *life-like* behaviour is a fascinating pursuit of the sciences that tries to characterise the qualities of physical entities which helps us to distinguish between life and *non-life*. This pursuit has major implications in various fields of science. For example, when we model *life* through some known characteristics, it allows us to observe patterns that can guide progress in discovering more characteristics of the biology of *life*; it also helps us confirm observations/behaviours we see as a natural consequence of the model. Which is not only useful to understand ourselves better, but could also help us better search for life outside our planet.^1^
+Understanding *life-like* behaviour is a fascinating pursuit of the sciences that tries to characterise the qualities of physical entities which helps us to distinguish between life and *non-life*. This pursuit has major implications in various fields of science. For example, when we model *life* through some known characteristics, it allows us to observe patterns that can guide progress in discovering more characteristics of the biology of *life*; it also helps us confirm observations/behaviours we see as a natural consequence of the model. Which is not only useful to understand ourselves better, but could also help us better search for life outside our planet.
 
 ## Note about the primary resource:
 
@@ -25,7 +25,7 @@ But this project also wishes to depart and go further than the book in a few asp
    - To also make it easier to build on the work that has already been done in this project and make/suggest improvements to it. It is also more helpful when we are creating more abstracted code from observed patterns. Which is focused on my project to a higher degree and therefore help newer programmers learn how to do it as well as compared to Schiffman’s book.
    - Finally, in \[Schiffman 24\], we mostly go from phenomena to code, but after the implementation, there is not much importance in going back and understanding the output simulation and. This is because the code written in [Schiffman 24] is the polished version and most improvements made to code are constructed over explored. Whereas in this project (especially in later stages) there is slightly more emphasis on this aspect. Where code improvements also sometimes come through exploration, this is also especially highlighted in the publicly available GitHub repository ([see here](https://github.com/beeezal/Honours-project-codes) for this project - where one can view the commits and see the growth of code over time.
 
-Therefore, in this project we are approaching the question of *“What makes life, life?”* through the lens of *motion* phenomena of physical entities and with the eyes of computer simulation. We take interest in motion phenomena because *natural* phenomena cover a broad area of topics, therefore focusing on a particular section of it lets us dive deeper into more elaborate models. Hence, providing further insight into the various characteristics (or components) of *natural* phenomena. *Motion* is also chosen because it integrates with animated simulations (i.e. the visualisation aspect) and Object Oriented Programming easily, which is the core engine of the simulations in this project, especially the p5.js library that we will be using.
+Therefore, in this project we are approaching the question of *“What makes life, life?”* through the lens of *motion* phenomena of physical entities and with the eyes of computer simulation. We take interest in motion phenomena because *natural* phenomena cover a broad area of topics, therefore focusing on a particular section of it lets us dive deeper into more elaborate models. Hence, providing further insight into the various characteristics (or components) of *natural* phenomena. *Motion* is also chosen because it integrates with animated simulations (i.e. the visualisation aspect) and Object Oriented Programming easily, which is the core engine of the simulations in this project, especially the **p5.js** library that we will be using.
 
 ## Flow of content:
 
@@ -54,15 +54,15 @@ Finally, in 5^th^ chapter we devise a model for multi-agent systems based on the
 
 **Sketch**
 
-- Refers to the entire bundle of files that runs a .js file containing p5 objects - index.html, style.css, p5.js / p5.min.js (the library file) and finally the main source-code file
+- Refers to the entire bundle of files that runs a .js file containing **p5** objects - index.html, style.css, **p5**.js / **p5**.min.js (the library file) and finally the main source-code file
 - But also can refer to just the source-code file, hence usually named sketch.js
 
 **Canvas**
 
 - The drawing board / screen / environment in which all animation that is coded in my sketch.js file is drawn to.
-- To create our virtual environment, i.e., the p5 Canvas - we call the createCanvas(width, height) in the setup() method.
+- To create our virtual environment, i.e., the p5 Canvas - we call the `createCanvas(width, height)` in the `setup()` method.
 
-Look at [Appendix A]() to learn how to run the code written in this project.
+Look at [Appendix](../appendix#appendix-how-to-run-p5-sketches) to learn how to run the code written in this project.
 
 ### 0.2.2 Common functions
 

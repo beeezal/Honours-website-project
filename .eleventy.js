@@ -24,8 +24,7 @@ export default function(eleventyConfig) {
 
     mdLib.use(markdownItMath, {
       engine: katex,
-      delimiters: 'dollars',
-      katexOptions: { macros: { "\\R": "\\mathbb{R}" } }
+      delimiters: 'dollars'
     });
 
     mdLib.use(markdownItSup);

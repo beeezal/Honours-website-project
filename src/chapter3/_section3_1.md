@@ -43,8 +43,8 @@ permalink: false
 
 Random arrangement of the vectors:
 
-* A predefined array of permuted numbers (0-255) $P$ and an array of 4 vectors - $G$ - where each vector is the vector pointing from origin to one corner of the unit square.^2 ^  
-* Now for each lattice point $(x,y) \in Z^2$ - ( Actually just $\{0...255\}^2$ ), we assign the vector $V(x,y)$ = $G’[ x + P[y]]$ - that is the $(x + P[y])^(th)$ element of $G’$, where $G’$ is just the array $G$ repeated till it is the size of $P$. But note that adding $x + P[y]$ may be greater than $255$, but is less than $512$ - therefore we’ll just double our $G’$ and $P$ arrays- repeating their elements. 
+* A predefined array of permuted numbers (0-255) $P$ and an array of 4 vectors - $G$ - where each vector is the vector pointing from origin to one corner of the unit square.^2^  
+* Now for each lattice point $(x,y) \in Z^2$ - ( Actually just $\{0...255\}^2$ ), we assign the vector $V(x,y)$ = $G’[ x + P[y]]$ - that is the $(x + P[y])^{th}$ element of $G’$, where $G’$ is just the array $G$ repeated till it is the size of $P$. But note that adding $x + P[y]$ may be greater than $255$, but is less than $512$ - therefore we’ll just double our $G’$ and $P$ arrays- repeating their elements. 
 
 The choice of the particular $P$ array - is arbitrary - made by Perlin, after some randomisation and a visual output that was enough for his purposes. Though modern implementations come with a seeding option to generate a different permutation list.   
 But an important characteristic is that for a given seed, every lattice point will also have the same vector assigned to it  

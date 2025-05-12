@@ -9,7 +9,7 @@ export default function(eleventyConfig) {
 
   eleventyConfig.addPassthroughCopy({
     'node_modules/katex/dist/katex.min.css': 'assets/cssStyle/katex.min.css',
-    'node_modules/katex/dist/fonts': 'assets/cssSyle/fonts'
+    'node_modules/katex/dist/fonts': 'assets/cssStyle/fonts'
   });
 
   // Layouts alias

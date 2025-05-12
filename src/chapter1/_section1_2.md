@@ -12,7 +12,7 @@ let vec = `createVector(30, 200)`
 Thus vec represents the position vector pointing from the origin to $(30, 200)$
 
 *Basic Vector operations:*  
-Where v1, v2 are vectors and a is a real number
+Where $v_1$, $v_2$ are vectors and a is a real number
 
 - $v_1 + v_2$ : `v1.add(v2)`  
 - $v_1 - v_2$  : `v1.sub(v2)`  
@@ -23,7 +23,7 @@ Where v1, v2 are vectors and a is a real number
 - Random vector from unit circle - ` p5.Vector.random2D()`
 
 
-Note that in `v1.function()` , `function()` is called as a method of the class. Any name that appears as v1*.name* is a property of the class that v1 represents, the ‘ . ’ allows us to access those properties - thus we are able to call methods like `add()` since they belong to the p5.Vector class. To view all the methods please check the [p5 reference](https://p5js.org/reference/p5/p5.Vector/).
+Note that in `v1.function()` , `function()` is called as a method of the class. Any name that appears as `v1.name` is a property of the class that $v_1$ represents, the ‘ . ’ allows us to access those properties - thus we are able to call methods like `add()` since they belong to the `p5.Vector` class. To view all the methods please check the [p5 reference](https://p5js.org/reference/p5/p5.Vector/).
 
 ### 1.3.3 Physical entities and classes:
 

@@ -25,8 +25,8 @@ Agent-based modelling in this setting has been researched to some extent, produc
 
 #### Smart / Learning Autonomous Agents
 
-As mentioned in [chapter 5](?tab=t.0#heading=h.1bucb7iomg55), in order to overcome the bridge of simulating agents that seem to exhibit high intelligence level / reasoning, we can introduce neural networks and machine learning algorithms into the picture. Keeping the context of the paper, one interesting question that we could try and answer is:  
-Can pseudo-randomness evolve as a strategy when we use generational neuro-evolution as covered in \[Schiffman 24\]. That is, suppose we are trying to simulate the example of the gazelle as given [here](?tab=t.0#heading=h.8q72otatt7h7), then will the gazelle learn to make ‘random’ turns at ‘random’ intervals of time (so evolves to become a *Wanderer*) 
+As mentioned in [chapter 5](../chapter5#51-phenomena), in order to overcome the bridge of simulating agents that seem to exhibit high intelligence level / reasoning, we can introduce neural networks and machine learning algorithms into the picture. Keeping the context of the paper, one interesting question that we could try and answer is:  
+Can pseudo-randomness evolve as a strategy when we use generational neuro-evolution as covered in \[Schiffman 24\]. That is, suppose we are trying to simulate the example of the gazelle as given [here](../chapter4/#41-phenomena), then will the gazelle learn to make ‘random’ turns at ‘random’ intervals of time (so evolves to become a *Wanderer*) 
 
 #### What is Autonomy in an Algorithmic world?
 
@@ -36,7 +36,7 @@ There are multiple parameters we could try and observe. For example turn speed a
 
 #### More noise walkers
 
-Perlin noise is a fairly old algorithm introduced in 1985, and although improvements were made to it later \[Perlin 02\], it is still one of the earlier procedural noise functions. Much more newer algorithms have been developed more recently of which perform than Perlin noise on various aspects and take lesser space \[LSRD\*10\] . But most of the evaluation parameters stem from computer graphics. So, there could be merit in trying to apply these algorithms to our motion simulations like in [chapter 3]() and compare them visually (do they look different and ‘better’ in terms of appearing *natural* ), qualitatively (how good these movers could be at evading or foraging \[ Reynolds 99 \]) and quantitatively as addressed in the previous section.
+Perlin noise is a fairly old algorithm introduced in 1985, and although improvements were made to it later \[Perlin 02\], it is still one of the earlier procedural noise functions. Much more newer algorithms have been developed more recently of which perform than Perlin noise on various aspects and take lesser space \[LSRD\*10\] . But most of the evaluation parameters stem from computer graphics. So, there could be merit in trying to apply these algorithms to our motion simulations like in [chapter 3](../chapter3/#332-implementation-of-the-perlin-noise-walker) and compare them visually (do they look different and ‘better’ in terms of appearing *natural* ), qualitatively (how good these movers could be at evading or foraging \[ Reynolds 99 \]) and quantitatively as addressed in the previous section.
 # Conclusion
 
 In exploring all the topics covered in this project, I have learned greatly to write, think and speak in the language of code. It has helped me see how thinking with an object-oriented approach can help me break down a phenomenon/problem into smaller components; and understand how our perspective affects our modelling choices which in turn changes how the implementation is made. Therefore I hope the reader/viewer is able to see these learnings through the project, and that they too could learn one or two similar things.

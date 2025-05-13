@@ -103,11 +103,11 @@ Applied parameters:
 
 * Direction, directly through $x, y$ coordinates of velocity,  
 
-  range \= $(-3,3) $ 
+  range = $(-3, 3)$ 
 * Velocity (both magnitude and direction)  
 
   range: 
-  - $mag \in (0, $ diameter $/2)$,   
+  - mag $ \in (0,$  diameter $/2)$,   
   - direction $\in (-1,1)$
 ```js
 /* Code for a 2D RW that is manupilated according to perlin noise.

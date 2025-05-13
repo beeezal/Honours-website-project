@@ -8,11 +8,11 @@ permalink: false
 ### 2.3.3 Square-distribution random walker
 
 * Rand_func : `random()` - uniform distribution  
-  - Applied parameter \= angle of velocity, range \= \[0, 2π\] radians and
+  - Applied parameter \= angle of velocity, range = $[0, π]$ radians and
 * `randomSquared()` \- custom distribution, using *accept-reject* method  
   - Applied parameter \= magnitude, range \= $[0, 50]$ px
 
-  ```js
+```js
   class Walker{                                    
     constructor(x, y, r) {
       this.location = createVector(x, y);
@@ -92,6 +92,6 @@ permalink: false
     let vel_mag =(frameCount%180==0)?randomSquared()*50:3;
     w.move(vel_mag, true);
   }
-  ```
+```
 
 {% include "simulation-grid.html" %}

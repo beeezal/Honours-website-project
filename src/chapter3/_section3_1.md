@@ -1,5 +1,7 @@
 ---
 tags: 'chap3'
+script: '/assets/scripts/chap3_01.js'
+id: 'sec1'
 permalink: false
 ---
 
@@ -107,7 +109,7 @@ Applied parameters:
 * Velocity (both magnitude and direction)  
 
   range: 
-  - mag $ \in (0,$  diameter $/2)$,   
+  - mag $\in (0,$  diameter $/2)$,   
   - direction $\in (-1,1)$
 ```js
 /* Code for a 2D RW that is manupilated according to perlin noise.
@@ -175,7 +177,10 @@ function draw() {
   w.step('direction');
 } 
 ```
-A simulation of a similar implementation of the Perlin Noise walker is added to the 4^th^ chapter, in section [4.3.4]()
+
+{% include "simulation-grid.html" %}
+
+A simulation of a similar implementation of the Perlin Noise walker is added to the 4^th^ chapter, in section [4.3.4](../chapter4/#434-comparing-implementations-of-random-motion-behaviours)
 
 ## Notes:
 

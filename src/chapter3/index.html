@@ -9,6 +9,18 @@ order: 4
 <h1>Chapter 3</h1>
 <h1>Perlin Noise and Smooth Movers</h1>
 <hr>
+<!-- Shared utility function for pausing and resuming any sketch -->
+<script>  
+  let pauseButtonToggle = function (button, sketch) {
+    if (sketch.isLooping()) {
+      button.innerText = "Play";
+      sketch.noLoop();
+    } else {
+      button.innerText = "Pause";
+      sketch.loop();
+    }
+  }
+</script>
 
 {% for section in collections.chap3 %}
   {{ section.templateContent | safe }}

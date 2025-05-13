@@ -56,7 +56,7 @@ let normalWalkerScript = function(p) {
 
     stdDevSlider = p.createSlider(p.PI/60, p.PI/6, p.PI/8, 0);
     stdDevSlider.parent(container);
-    label = p.createSpan('Std Dev: ' + stdDevSlider.value().toFixed(3));
+    label = p.createSpan('Std Dev: ' + p.degrees(stdDevSlider.value()).toFixed(3) + '°');
     label.parent(container);
 
     stdDevSlider.input(() => {

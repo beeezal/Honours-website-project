@@ -86,13 +86,13 @@ img {
 
 /* Style all divs inside interactive panel */
 .interactive-panel div {
-  margin-bottom: 15px;
+  margin: 5px 0;
   display: flex;
   flex-direction: column;
 }
 
 .interactive-panel span {
-  margin-bottom: 5px;
+  margin-bottom: 3px;
   font-size: 14px;
   color: white;
 }
@@ -106,10 +106,21 @@ img {
   margin-top: 5px;
 }
 
+.interactive-panel div > label{
+  display: flex;
+  align-items: center;
+  margin: 3px 0;
+}
+
+.interactive-panel input[type="radio"] {
+  margin: 3px 3px;
+}
+
 .interactive-panel label {
   font-size: 14px;
   color: white;
 }
+
 
 /* Style for pause and play buttons */
 .control-buttons {

@@ -22,6 +22,18 @@
 <h1>Chapter 3</h1>
 <h1>Perlin Noise and Smooth Movers</h1>
 <hr>
+<!-- Shared utility function for pausing and resuming any sketch -->
+<script>  
+  let pauseButtonToggle = function (button, sketch) {
+    if (sketch.isLooping()) {
+      button.innerText = "Play";
+      sketch.noLoop();
+    } else {
+      button.innerText = "Pause";
+      sketch.loop();
+    }
+  }
+</script>
 
 
   <h2>3.1 Phenomena</h2>
@@ -151,7 +163,7 @@ But an important characteristic is that for a given seed, every lattice point wi
 <p>Velocity (both magnitude and direction)</p>
 <p>range:</p>
 <ul>
-<li>mag $ \in (0,$  diameter <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">/</mi><mn>2</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">/2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">/2</span><span class="mclose">)</span></span></span></span></eq>,</li>
+<li>mag <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∈</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo></mrow><annotation encoding="application/x-tex">\in (0,</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">0</span><span class="mpunct">,</span></span></span></span></eq>  diameter <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">/</mi><mn>2</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">/2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">/2</span><span class="mclose">)</span></span></span></span></eq>,</li>
 <li>direction <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∈</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\in (-1,1)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">−</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span></eq></li>
 </ul>
 </li>
@@ -220,7 +232,15 @@ Hereafter noise value will be referred as n-value*/</span>
   w<span class="token punctuation">.</span><span class="token function">display</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                             
   w<span class="token punctuation">.</span><span class="token function">step</span><span class="token punctuation">(</span><span class="token string">'direction'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span> </code></pre>
-<p>A simulation of a similar implementation of the Perlin Noise walker is added to the 4<sup>th</sup> chapter, in section <a href="">4.3.4</a></p>
+<div class="simulation-container">
+  <div id="sec1" class="interactive-sketch"></div>
+  <div id="interactive-controls-sec1" class="interactive-panel"></div>
+  <div class="control-buttons">
+    <button onclick="pauseButtonToggle(this, sec1Sketch);">Play</button> 
+    <button onclick="sec1Sketch.initializeSketch();">Reset</button>
+  </div>
+</div>
+<p>A simulation of a similar implementation of the Perlin Noise walker is added to the 4<sup>th</sup> chapter, in section <a href="../chapter4/#434-comparing-implementations-of-random-motion-behaviours">4.3.4</a></p>
 <h2>Notes:</h2>
 <ol>
 <li>
@@ -244,7 +264,7 @@ Because the idea of the algorithm is more important than any specific implementa
 <!-- Although there are no scripts in this chapter as of now -->
 <!-- leaving the below code as a placeholder for future use -->
 
-  <script src="."></script>
+  <script src="/Honours-website-project/assets/scripts/chap3_01.js"></script>
 
 
 </body>

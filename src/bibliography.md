@@ -3,6 +3,8 @@ tags: [main, bibliography, simulation]
 title: Bibliography
 layout: 'base'
 order: 8
+prevPage: '/conclusion/'
+nextPage: '/appendix/'
 ---
 # Bibliography
 

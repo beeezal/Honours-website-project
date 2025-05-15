@@ -3,6 +3,8 @@ tags: [main, conclusion, simulation]
 title: Conclusion
 layout: 'base'
 order: 7
+prevPage: '/chapter5/'
+nextPage: '/bibliography/'
 ---
 # Future Work
 

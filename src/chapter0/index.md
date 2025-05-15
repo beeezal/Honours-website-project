@@ -4,6 +4,7 @@ title: Introduction
 layout: 'base'
 number: 0
 order: 1
+nextPage: '/chapter1/'
 ---
 
 # Chapter 0

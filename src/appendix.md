@@ -2,6 +2,7 @@
 tags: [appendix, simulation, p5]
 title: 'Appendix: How to run p5 sketches'
 layout: 'base'
+prevPage: '/bibliography/'
 ---
 # Appendix: How to run p5 sketches
 

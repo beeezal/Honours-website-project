@@ -105,54 +105,55 @@ Applied parameters:
 
 * Direction, directly through $x, y$ coordinates of velocity,  
 
-  range = $(-3, 3)$ 
+  range = $(-4, 4)$ 
 * Velocity (both magnitude and direction)  
-
   range: 
-  - mag $\in (0,$  diameter $/2)$,   
+  - mag $\in (0,$  radius $\times 1.5)$,   
   - direction $\in (-1,1)$
 ```js
 /* Code for a 2D RW that is manupilated according to perlin noise.
 Walk is performed by picking a noise value separately for the x-coord and y-coord
-Hereafter noise value will be referred as n-value*/
+In this program noise value will be referred as n-value 
+*/
 
 class Walker {
-  /* Setting class fields - offests for each co-ordinate (starting point in time for the noise function)
-  x and y offests are always increased and z offest only when step() affecting_parameter is 'step'*/
-  xoff = 0;
-  yoff = 1000;      ////Note that the difference is arbitrary, but it is important,
-  zoff = 2000;      //in order to avoid co-orrelation between each direction (in a given time t)
+  // Setting class fields - offests for each co-ordinate 
+  // i.e. (starting point in time for the noise function)
+  // x and y offests are always increased and mag offest only when update() affecting_parameter is 'step'
+  xOffset = 0;
+  yOffset = 1000;        // Note that the difference is arbitrary, but it is important,
+  magOffset = 2000;      // in order to avoid co-orrelation between each direction (in a given time t)
   constructor(x,y,r) {
     this.x = x;
     this.y = y;
     this.r = r;
+    this.D = this.r * 2;
   }
 
   display() {
-    //Displays the walker at the current location with a circle of radius r
     stroke(0);
     fill(100);
-    circle(this.x, this.y,this.r);
+    circle(this.x, this.y,this.D);
   }
 
-  step(affecting_params='direction') {
+  update(affecting_params='direction') {
     //Switch statement to determine the which parameter is being affected. Default: direction
     //All of them are affected by Perlin noise
     switch(affecting_params){
       // Changing the direction in which the walker is moving
       case 'direction':
-        this.x += map(noise(this.xoff),0,1,-1,1)*3;     //map() scales n-value to (-1,1) from (0,1) - Enabling RW to move in all directions
-        this.y += map(noise(this.yoff),0,1,-1,1)*3;     //3 is the maginitude of the step. An arbitrary standard accross all RW methods
+        this.x += map(noise(this.xoff),0,1,-1,1)*4;     //map() scales n-value to (-1,1) from (0,1) - Enabling RW to move in all directions
+        this.y += map(noise(this.yoff),0,1,-1,1)*4;     //4 is the maginitude of the step. An arbitrary standard accross all RW methods
         break;
       // Directly changing the location of the walker
       case 'location':
-        this.x = noise(this.xoff)*width;                //noise(t)*k - scales n-value to (0,k) from (0,1)
-        this.y = noise(this.yoff)*height;               //Therefore here x-values are (0,width) and y-values are (0,height)
+        this.x = noise(this.xoff)*width;    //noise(t)*k - scales n-value to (0,k) from (0,1)
+        this.y = noise(this.yoff)*height;   //Therefore here x-values are (0,width) and y-values are (0,height)
         break;
       
       // Changing both step size and direction
       case 'step':
-        let vel_mag = noise(this.zoff)*(this.r/2);
+        let vel_mag = noise(this.zoff)*(this.r*1.5);
         this.x += map(noise(this.xoff),0,1,-1,1)*vel_mag;
         this.y += map(noise(this.yoff),0,1,-1,1)*vel_mag;
         this.zoff += 0.01;
@@ -168,19 +169,20 @@ let w;
 function setup() {
   createCanvas(windowWidth, windowHeight);
   background(255);
-  w = new Walker(width/2, height/2, 20);
+  w = new Walker(width/2, height/2, 8);
 }
 
 function draw() {
   // Be aware of which function you call first according to the step type you chose
   w.display();                             
-  w.step('direction');
+  w.update('direction');
 } 
 ```
+Note that the implementation [code for the simulation](https://github.com/beeezal/Honours-website-project/blob/main/src/assets/scripts/chap3_01.js) is syntatically different from the above code, but the ideas are the same. Main difference is that the order of calling `display()` and `update()` is taken care of by the program, and instead of a switch statement we use an object (with a function for each param).
 
 {% include "simulation-grid.html" %}
 
-A simulation of a similar implementation of the Perlin Noise walker is added to the 4^th^ chapter, in section [4.3.4](../chapter4/#434-comparing-implementations-of-random-motion-behaviours)
+A simulation of a similar implementation of the Perlin Noise walker is added to the 4^th^ chapter, in section [4.3.4](../chapter4/#434-comparing-implementations-of-random-motion-behaviours).
 
 ## Notes:
 

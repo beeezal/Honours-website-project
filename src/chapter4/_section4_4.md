@@ -80,6 +80,44 @@ So, below are the visual observations of each of these movers. This is meant to 
 updateVelocity = `setAngle()`
 And update = `step()` where,
 
+```js
+  setAngle(sigma = PI/8, mu = this.vel.heading(), changeRate = 1, changeColor = false){ 
+    // Function to set the direction angle of the walker's velocity
+    // changeRate - rate at which we change the angle in terms of frames
+    // changeColor - Whether walker's color changes when the direction changes significantly (>2 SDs)
+
+    if (frameCount % changeRate === 0) {
+      // randomGaussian() returns a random sample from a N(0,1) 
+      // Therefore by performing scaling and translation of the distribution we have 
+      // the directionAngle distributed according to N(current direction,π/8) or N(μ,σ)
+      
+      this.directionAngle = randomGaussian() * sigma + mu;     //σ and μ were picked experimentally
+      // this.drectionAngle = randomGaussian(mu, sigma);		
+      
+      // Changing color if change in direction is more than 2 SDs
+      if ((changeColor) && abs(this.directionAngle - mu) >= 2*sigma) {
+      this.col = color(random(255), random(255), random(255));     // color is set by choosing random RGB values
+      }
+    }
+  }
+```
+
+and `step()` follows the general pattern implemented, with
+
+```js
+  step(vel_mag=3,chk_edges=false) {
+    this.updatePosHistory(1000);
+
+    this.setAngle(PI/8, this.vel.heading(), 1, false);
+    this.vel.setHeading(this.directionAngle);        
+    // v.setHeading(direction) is same as v = v.mag() * (cos(directionAngle), sin(directionAngle))                                       
+    this.vel.setMag(vel_mag);
+    this.pos.add(this.vel);
+
+    if (chk_edges){this.checkEdges();}
+  }
+```
+
 (The simulation show in chapter 2 is sufficient for the following observations. But an implementation following the above model can be found [here](https://github.com/beeezal/Honours-project-codes/blob/feat/trial-path-movers/Normal_Random_walker/sketch.js) )
 
 **Observations**
@@ -96,7 +134,11 @@ And update = `step()` where,
 
 updateVelocity = `static noisyVelocity()`
 
-with extended functionality to add noise to even step size, directly into `update` which is also written as `step()`.
+Extended functionality to add noise to even step size, directly into `step()` with parameters:
+- `noisyStepSize` : toggle for adding noise to step size, default = _true_
+- `relativeMaxStepSize` : decides the maximum of the range of noise added, default $=0.75$
+
+**NOTE**: setting the slider value to $0$ in the below simulation, sets `noisyStepSize` to _false_
 
 {% include "simulation-grid.html" %}
 
@@ -149,7 +191,7 @@ Then, one could say that there was no intention in the implementation of PerlinW
 
 But, one could draw equivalences between the algorithm for PerlinWalker and that of Wanderer, or even make them similar without introducing new design intentions, and there is still the problem of the uninformed viewer. Therefore, there must be more work done in regards to the definition of an autonomous agent, to clearly distinguish between each case mentioned here.
 
-Therefore I end this section by claiming that classification of wanderer is an edge case, and including that may have us include perlin noise as _autonomous_ well - is an important observation. yes as expected one should be able to go back from visuals to intended outcomes and check what is going on. All arbitrary variable choices in this proejct are in essence an outcome of this effect
+Therefore I end this section by claiming that classification of wanderer is an edge case, and including that may have us include perlin noise as _autonomous_ well - is an important observation. Yes, as expected one should be able to go back from visuals to intended outcomes and check what is going on. All arbitrary variable choices in this proejct are in essence an outcome of this effect
 
 ## Notes:
 

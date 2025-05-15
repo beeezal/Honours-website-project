@@ -19,6 +19,30 @@
 <body>
 {% block content %} 
   {{ content | safe }}
+
+  <nav class="chapter-navigation">
+    <div class="prev-container">
+    {% if prevPage %}
+      <a href="{{ prevPage | url }}" class="prev-link">
+        <span class="nav-arrow">←</span> Previous
+      </a>
+    {% endif %}
+  </div>
+  
+  <div class="home-container">
+    <a href="{{ '/' | url }}" class="home-link">
+      <span class="nav-icon">⌂</span> Home
+    </a>
+  </div>
+  
+  <div class="next-container">
+    {% if nextPage %}
+      <a href="{{ nextPage | url }}" class="next-link">
+        Next <span class="nav-arrow">→</span>
+      </a>
+    {% endif %}
+  </div>
+  </nav>
 {% endblock %}
 </body>
 </html>

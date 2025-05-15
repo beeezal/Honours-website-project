@@ -386,6 +386,37 @@ Seeking a randomly changing point on a circle - whose center lie ahead of the ag
 <p><strong>NormalWalker:</strong></p>
 <p>updateVelocity = <code>setAngle()</code><br>
 And update = <code>step()</code> where,</p>
+<pre tabindex="0" class="code-block"><code class="language-js">  <span class="token function">setAngle</span><span class="token punctuation">(</span><span class="token parameter">sigma <span class="token operator">=</span> <span class="token constant">PI</span><span class="token operator">/</span><span class="token number">8</span><span class="token punctuation">,</span> mu <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">.</span><span class="token function">heading</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> changeRate <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">,</span> changeColor <span class="token operator">=</span> <span class="token boolean">false</span></span><span class="token punctuation">)</span><span class="token punctuation">{</span> 
+    <span class="token comment">// Function to set the direction angle of the walker's velocity</span>
+    <span class="token comment">// changeRate - rate at which we change the angle in terms of frames</span>
+    <span class="token comment">// changeColor - Whether walker's color changes when the direction changes significantly (>2 SDs)</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>frameCount <span class="token operator">%</span> changeRate <span class="token operator">===</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token comment">// randomGaussian() returns a random sample from a N(0,1) </span>
+      <span class="token comment">// Therefore by performing scaling and translation of the distribution we have </span>
+      <span class="token comment">// the directionAngle distributed according to N(current direction,π/8) or N(μ,σ)</span>
+      
+      <span class="token keyword">this</span><span class="token punctuation">.</span>directionAngle <span class="token operator">=</span> <span class="token function">randomGaussian</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span> sigma <span class="token operator">+</span> mu<span class="token punctuation">;</span>     <span class="token comment">//σ and μ were picked experimentally</span>
+      <span class="token comment">// this.drectionAngle = randomGaussian(mu, sigma);		</span>
+      
+      <span class="token comment">// Changing color if change in direction is more than 2 SDs</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>changeColor<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token function">abs</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>directionAngle <span class="token operator">-</span> mu<span class="token punctuation">)</span> <span class="token operator">>=</span> <span class="token number">2</span><span class="token operator">*</span>sigma<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>col <span class="token operator">=</span> <span class="token function">color</span><span class="token punctuation">(</span><span class="token function">random</span><span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">random</span><span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">random</span><span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>     <span class="token comment">// color is set by choosing random RGB values</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span></code></pre>
+<p>and <code>step()</code> follows the general pattern implemented, with</p>
+<pre tabindex="0" class="code-block"><code class="language-js">  <span class="token function">step</span><span class="token punctuation">(</span><span class="token parameter">vel_mag<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">,</span>chk_edges<span class="token operator">=</span><span class="token boolean">false</span></span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">updatePosHistory</span><span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">setAngle</span><span class="token punctuation">(</span><span class="token constant">PI</span><span class="token operator">/</span><span class="token number">8</span><span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">.</span><span class="token function">heading</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">.</span><span class="token function">setHeading</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>directionAngle<span class="token punctuation">)</span><span class="token punctuation">;</span>        
+    <span class="token comment">// v.setHeading(direction) is same as v = v.mag() * (cos(directionAngle), sin(directionAngle))                                       </span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">.</span><span class="token function">setMag</span><span class="token punctuation">(</span>vel_mag<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>pos<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>vel<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>chk_edges<span class="token punctuation">)</span><span class="token punctuation">{</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">checkEdges</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token punctuation">}</span>
+  <span class="token punctuation">}</span></code></pre>
 <p>(The simulation show in chapter 2 is sufficient for the following observations. But an implementation following the above model can be found <a href="https://github.com/beeezal/Honours-project-codes/blob/feat/trial-path-movers/Normal_Random_walker/sketch.js">here</a> )</p>
 <p><strong>Observations</strong></p>
 <ul>
@@ -404,7 +435,12 @@ And update = <code>step()</code> where,</p>
 </ul>
 <p><strong>PerlinWalker</strong></p>
 <p>updateVelocity = <code>static noisyVelocity()</code></p>
-<p>with extended functionality to add noise to even step size, directly into <code>update</code> which is also written as <code>step()</code>.</p>
+<p>Extended functionality to add noise to even step size, directly into <code>step()</code> with parameters:</p>
+<ul>
+<li><code>noisyStepSize</code> : toggle for adding noise to step size, default = <em>true</em></li>
+<li><code>relativeMaxStepSize</code> : decides the maximum of the range of noise added, default <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mn>0.75</mn></mrow><annotation encoding="application/x-tex">=0.75</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.75</span></span></span></span></eq></li>
+</ul>
+<p><strong>NOTE</strong>: setting the slider value to <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn></mrow><annotation encoding="application/x-tex">0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></eq> in the below simulation, sets <code>noisyStepSize</code> to <em>false</em></p>
 <div class="simulation-container">
   <div id="sec4" class="interactive-sketch"></div>
   <div id="interactive-controls-sec4" class="interactive-panel"></div>
@@ -469,7 +505,7 @@ And update = <code>step()</code> where,</p>
 <p>For one might think that it is absurd to call ‘roam around’ or ‘walk randomly’ a goal at all in the first place. One could argue that it is indeed a goal when you introduce ‘sustained turning’ for the Wanderer. But one could also equally argue that the introduction of ‘be unpredictable’ or ‘change direction to avoid being caught by a predator’ makes it a goal for PerlinWalker. Such ambiguity could be resolved (or attempted to) by then looking at the model itself and intentions behind each choice.</p>
 <p>Then, one could say that there was no intention in the implementation of PerlinWalker beyond providing a smooth random walker, while the clear intentions of design for the Wanderer (which is definitely achieved) has directly affected the implementation - where we use desired velocity and steering forces in order to drive the motion of the mover.</p>
 <p>But, one could draw equivalences between the algorithm for PerlinWalker and that of Wanderer, or even make them similar without introducing new design intentions, and there is still the problem of the uninformed viewer. Therefore, there must be more work done in regards to the definition of an autonomous agent, to clearly distinguish between each case mentioned here.</p>
-<p>Therefore I end this section by claiming that classification of wanderer is an edge case, and including that may have us include perlin noise as <em>autonomous</em> well - is an important observation. yes as expected one should be able to go back from visuals to intended outcomes and check what is going on. All arbitrary variable choices in this proejct are in essence an outcome of this effect</p>
+<p>Therefore I end this section by claiming that classification of wanderer is an edge case, and including that may have us include perlin noise as <em>autonomous</em> well - is an important observation. Yes, as expected one should be able to go back from visuals to intended outcomes and check what is going on. All arbitrary variable choices in this proejct are in essence an outcome of this effect</p>
 <h2>Notes:</h2>
 <ol>
 <li>
@@ -509,6 +545,30 @@ To combat this we can define the individual behaviours from the class implementi
 
   <script src="/Honours-website-project/assets/scripts/chap4_04.js"></script>
 
+
+  <nav class="chapter-navigation">
+    <div class="prev-container">
+    
+      <a href="/Honours-website-project/chapter3/" class="prev-link">
+        <span class="nav-arrow">←</span> Previous
+      </a>
+    
+  </div>
+  
+  <div class="home-container">
+    <a href="/Honours-website-project/" class="home-link">
+      <span class="nav-icon">⌂</span> Home
+    </a>
+  </div>
+  
+  <div class="next-container">
+    
+      <a href="/Honours-website-project/chapter5/" class="next-link">
+        Next <span class="nav-arrow">→</span>
+      </a>
+    
+  </div>
+  </nav>
 
 </body>
 </html>

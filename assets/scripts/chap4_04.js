@@ -31,9 +31,13 @@ let perlinScript = function (p) {
       p.circle(this.pos.x, this.pos.y, this.r * 2);
     }
 
-    step(vel_mag = 3, chk_edges = true) {
+    step(noisyStepSize = false, vel_mag = 3, chk_edges = true, relativeMaxStepSize = 0.75) {
       this.updatePosHistory();
 
+      if(noisyStepSize){
+        vel_mag = p.noise(this.magOffset)*(this.r*relativeMaxStepSize);
+        this.magOffset += 0.01;
+    }   
       PerlinWalker.noisyVelocity(this.xOffset, this.yOffset, this.vel);
 
       this.vel.setMag(vel_mag);
@@ -46,8 +50,8 @@ let perlinScript = function (p) {
     }
 
     static noisyVelocity(xOffset, yOffset, vector) {
-      vector.set(p.map(p.noise(xOffset), 0, 1, -1, 1),
-        p.map(p.noise(yOffset), 0, 1, -1, 1)
+      vector.set((p.noise(xOffset) - 0.5)*2 ,
+        (p.noise(yOffset) - 0.5)*2
       );
     }
 
@@ -73,6 +77,8 @@ let perlinScript = function (p) {
   }
 
   let noiseWalker = new PerlinWalker(p.width / 2, p.height / 2, 12);
+  let container, maxStepSlider, relativeMaxStepSize, label;
+  let noisyStepSize = true;
 
   p.initializeSketch = function () {
     noiseWalker.pos.set(p.width / 2, p.height / 2);
@@ -87,13 +93,26 @@ let perlinScript = function (p) {
     let canvas = p.createCanvas(850, 550);
     canvas.parent('sec4');
 
+    container = p.select('#interactive-controls-sec4');
+
+    maxStepSlider = p.createSlider(0, 1, 0.75, 0);
+    maxStepSlider.parent(container);
+    label = p.createSpan('Max(NoisyStepSize): r*' + 0.75);
+    label.parent(container);
+
+    maxStepSlider.input(() => {
+      relativeMaxStepSize = maxStepSlider.value();
+      noisyStepSize = (relativeMaxStepSize > 0);
+      label.html('Max(NoisyStepSize): r*' + relativeMaxStepSize.toFixed(2));
+    });
+
     p.initializeSketch();
   }
 
   p.draw = function () {
     p.background(255);
     noiseWalker.display();
-    noiseWalker.step(3, true);
+    noiseWalker.step(noisyStepSize, 3, true, relativeMaxStepSize);
   }
 }
 
